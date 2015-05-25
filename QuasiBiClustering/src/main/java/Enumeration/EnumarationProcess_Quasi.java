@@ -109,7 +109,7 @@ public class EnumarationProcess_Quasi
                 cloneBrother._father = node;
             }
         }
-        return null;
+        return node;
     }
 
     private ArrayList<GeneUnit> createMutualNew(ArrayList<Sample> samples, ArrayList<GeneUnit> mutual_geneUnit) {
