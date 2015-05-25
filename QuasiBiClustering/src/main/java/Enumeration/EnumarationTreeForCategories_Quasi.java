@@ -37,7 +37,7 @@ public class EnumarationTreeForCategories_Quasi
     //Category _category;
 
 
-    public EnumarationTreeForCategories_Quasi(DataForEnumaration data) {
+    public EnumarationTreeForCategories_Quasi(DataForEnumaration data, ArrayList samplesInCat) {
 
     }
     //Nested method need to be delete after finish testing
