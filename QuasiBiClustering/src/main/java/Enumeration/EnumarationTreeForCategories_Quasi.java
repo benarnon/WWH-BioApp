@@ -53,9 +53,9 @@ public class EnumarationTreeForCategories_Quasi
         ArrayList<Cluster> clusters = new ArrayList<Cluster>();
         Quasi_biclique clique;
         for (int i = 0; i < cliques.size(); i++) {
-
-
-
+            clique = cliques.get(i);
+            Cluster cluster = new Cluster(clique._mutual_geneunit,clique._samples);
+            _clusters.add(cluster);
         }
 
     }
@@ -65,5 +65,9 @@ public class EnumarationTreeForCategories_Quasi
     }
     private void fill_pvalues(ArrayList<Cluster> clusters, DataForEnumaration data, int genesInCatNum) {
 
+    }
+
+    public ArrayList<Cluster> get_clusters() {
+        return _clusters;
     }
 }

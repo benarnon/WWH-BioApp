@@ -18,7 +18,7 @@ public class Main_Run {
         System.out.println("DONE with data for enumeration");
 
         EnumarationTreeForCategories_Quasi tree = new EnumarationTreeForCategories_Quasi(data,data.getSamples());
-        System.out.println("checking git");
+        System.out.println("number of " + tree.get_clusters().size());
 
     }
 }
