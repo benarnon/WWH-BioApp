@@ -15,7 +15,7 @@ import java.util.Stack;
 public class EnumarationProcess_Quasi
 {
 
-        ArrayList<Sample> _genes;
+        ArrayList<Sample> _samples;
         ArrayList<GeneUnit> _geneUnits;
 
         Clusters_Holder _cluster_holder;
@@ -26,11 +26,48 @@ public class EnumarationProcess_Quasi
 
         public ArrayList<Quasi_biclique> _quasi_bicliques = new ArrayList<Quasi_biclique>();
 
-    public void work(ArrayList<Sample> samples, ArrayList<GeneUnit> geneunits){
+    public void work(ArrayList<Sample> samples, ArrayList<GeneUnit> geneunits) throws Exception {
+       _samples = samples;
+       _geneUnits = geneunits;
+
+        _cluster_holder = new Clusters_Holder();
+
+        construct_tree();
 
     }
 
-    private void construct_tree(){
+    private void construct_tree() throws Exception {
+        _treeRoot = new Node(new Sample(""));
+
+        Sample dummySample = new Sample("dummy");
+        Node dummy = new Node(dummySample);
+
+        dummy._mutual_geneUnit = this._geneUnits;
+        dummy._leavesInSubtree.add(dummy);
+        dummy._father = _treeRoot;
+
+        dummy._samples = new ArrayList<Sample>();
+
+        _treeRoot._children.add(dummy);
+        _treeRoot._leavesInSubtree.add(dummy);
+
+        Sample sample;
+        Node node;
+        for (int i = 0; i < _samples.size() ; i++) {
+            sample = _samples.get(i);
+            if(sample.getMappedGeneUnitsList().size() >= EnumParams.minNumOfGeneUnit){
+                node = appendBrothers(sample);
+                if (node._children.size()>0)
+                {
+                    _treeRoot._children.add(node);
+                    node._father = _treeRoot;
+                    _treeRoot._leavesInSubtree.addAll(node._leavesInSubtree);
+                }
+            }
+        }
+
+
+
 
     }
 
