@@ -4,9 +4,9 @@ package Mains;
  * Created by user on 5/10/15.
  */
 public class EnumParams {
-    public static int minNumOfGeneUnit= 3;
+    public static int minNumOfGeneUnit= 2;
 
-    public static int minNumOfSamples = 3;
+    public static int minNumOfSamples = 1;
 
     public static int error_tolerance_samples = 0;
 

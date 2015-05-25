@@ -17,9 +17,7 @@ public class Main_Run {
         DataForEnumaration data = new DataForEnumaration(genomesFile,sampleFile,matrixFile);
         System.out.println("DONE with data for enumeration");
 
-        EnumarationTreeForCategories_Quasi tree = new EnumarationTreeForCategories_Quasi(data);
-
-
+        EnumarationTreeForCategories_Quasi tree = new EnumarationTreeForCategories_Quasi(data,data.getSamples());
 
     }
 }
