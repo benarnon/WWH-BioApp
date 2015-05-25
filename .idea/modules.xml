@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/Analyst/Analyst.iml" filepath="$PROJECT_DIR$/Analyst/Analyst.iml" />
+      <module fileurl="file://$PROJECT_DIR$/CloudBurst/CloudBurst.iml" filepath="$PROJECT_DIR$/CloudBurst/CloudBurst.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Gui/Gui.iml" filepath="$PROJECT_DIR$/Gui/Gui.iml" />
+      <module fileurl="file://$PROJECT_DIR$/QuasiBiClustering/QuasiBiClustering.iml" filepath="$PROJECT_DIR$/QuasiBiClustering/QuasiBiClustering.iml" />
+      <module fileurl="file://$PROJECT_DIR$/VectorCreator/VectorCreator.iml" filepath="$PROJECT_DIR$/VectorCreator/VectorCreator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/WWH-BioApp.iml" filepath="$PROJECT_DIR$/WWH-BioApp.iml" />
+    </modules>
+  </component>
+</project>
