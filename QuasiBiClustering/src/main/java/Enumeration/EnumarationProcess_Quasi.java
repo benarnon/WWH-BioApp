@@ -3,6 +3,7 @@ package Enumeration;
 
 import BasicComponent.GeneUnit;
 import BasicComponent.Sample;
+import Mains.EnumParams;
 
 import java.util.ArrayList;
 import java.util.Stack;
@@ -36,14 +37,63 @@ public class EnumarationProcess_Quasi
     public Node nested_appendBrothers(Sample sample) throws Exception {
         return appendBrothers(sample);
     }
+
     private Node appendBrothers(Sample sample)throws Exception
     {
+        Node brother, cloneBrother, leaf;
+        boolean ans;
+        Node node = new Node(sample);
+
+        for (int i = 0; i < _treeRoot._children.size(); i++) {
+            brother = _treeRoot._children.get(i);
+            cloneBrother = brother.clone();
+            ans = true;
+
+            for (int j = 0; j < cloneBrother._leavesInSubtree.size(); j++) {
+                leaf = cloneBrother._leavesInSubtree.get(j);
+                leaf._samples.add(sample);
+                leaf._mutual_geneUnit = createMutualNew(leaf._samples,leaf._mutual_geneUnit);
+
+                if(leaf._mutual_geneUnit.size() >= EnumParams.minNumOfGeneUnit){
+                    if(leaf._samples.size() >= EnumParams.minNumOfSamples){
+                        generateCliques(leaf._samples,leaf._mutual_geneUnit);
+                    }
+                }
+
+                else{
+                    ans = ans & deletePath(leaf);
+                    cloneBrother._leavesInSubtree.remove(leaf);
+                    cloneBrother._father = node;
+                }
+            }
+            if(ans){
+                node._children.add(cloneBrother);
+                node._leavesInSubtree.addAll(cloneBrother._leavesInSubtree);
+                cloneBrother._father = node;
+            }
+        }
         return null;
+    }
+
+    private ArrayList<GeneUnit> createMutualNew(ArrayList<Sample> samples, ArrayList<GeneUnit> mutual_geneUnit) {
+        ArrayList<GeneUnit> ans = new ArrayList<GeneUnit>();
+        for (int i = 0; i < mutual_geneUnit.size(); i++) {
+            boolean check = true;
+            for (int j = 0; j < samples.size(); j++) {
+                if(!samples.get(j).getMappedGeneUnitsList().contains(mutual_geneUnit.get(i)))
+                    check = false;
+            }
+            if (check)
+                ans.add(mutual_geneUnit.get(i));
+
+        }
+        return ans;
     }
 
     public boolean nested_deletePath(Node leaf){
         return deletePath(leaf);
     }
+
     private boolean deletePath(Node leaf){
         return false;
     }
@@ -54,6 +104,9 @@ public class EnumarationProcess_Quasi
     }
     private void generateCliques(ArrayList<Sample> x_new,
                                  ArrayList<GeneUnit> mutual_human_mirs_new) {
+        Quasi_biclique clique = new Quasi_biclique(x_new,mutual_human_mirs_new);
+        _quasi_bicliques.add(clique);
+
 
     }
 
@@ -72,7 +125,7 @@ public class EnumarationProcess_Quasi
         ArrayList<Node> _children;
         Node _father;
         ArrayList<Node> _leavesInSubtree;
-        Sample _gene;
+        Sample _sample;
         ArrayList<GeneUnit> _mutual_geneUnit;
 
         ArrayList<Sample> _samples; //will be relevant only for the leaf nodes
@@ -85,7 +138,7 @@ public class EnumarationProcess_Quasi
 
         Node(Sample sample)
         {
-            _gene = sample;
+            _sample = sample;
             _children = new ArrayList<Node>();
             _leavesInSubtree = new ArrayList<Node>();
             _mutual_geneUnit = new ArrayList<GeneUnit>();
@@ -98,7 +151,7 @@ public class EnumarationProcess_Quasi
         }
         protected Node clone()
         {
-            Node newN = new Node(_gene);
+            Node newN = new Node(_sample);
             if (_children.size()==0) //leaf
             {
                 newN._mutual_geneUnit = new ArrayList<GeneUnit>();
@@ -130,7 +183,7 @@ public class EnumarationProcess_Quasi
 
         public String toString()
         {
-            return _gene +" "+ _leavesInSubtree.size();
+            return _sample +" "+ _leavesInSubtree.size();
         }
         //
         public boolean isValid()
@@ -176,7 +229,7 @@ public class EnumarationProcess_Quasi
             {
                 //System.out.println(current);
                 if (!current.equals(_treeRoot))
-                    ans.add(0,current._gene);
+                    ans.add(0,current._sample);
                 current = current._father;
             }
             return ans;
