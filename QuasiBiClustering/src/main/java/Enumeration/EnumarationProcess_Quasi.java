@@ -1,7 +1,7 @@
 package Enumeration;
 
 
-import BasicComponent.GeneUnit;
+import FeatureRelatedComponent.GeneUnit;
 import BasicComponent.Sample;
 import Mains.EnumParams;
 
@@ -41,7 +41,6 @@ public class EnumarationProcess_Quasi
 
         Sample dummySample = new Sample("dummy");
         Node dummy = new Node(dummySample);
-
         dummy._mutual_geneUnit = this._geneUnits;
         dummy._leavesInSubtree.add(dummy);
         dummy._father = _treeRoot;
@@ -55,7 +54,7 @@ public class EnumarationProcess_Quasi
         Node node;
         for (int i = 0; i < _samples.size() ; i++) {
             sample = _samples.get(i);
-            if(sample.getMappedGeneUnitsList().size() >= EnumParams.minNumOfGeneUnit){
+            if(sample.getFeature(EnumParams.GenesFeatureName).getFeatureMemebers().size() >= EnumParams.minNumOfGeneUnit){
                 node = appendBrothers(sample);
                 if (node._children.size()>0)
                 {
@@ -117,7 +116,7 @@ public class EnumarationProcess_Quasi
         for (int i = 0; i < mutual_geneUnit.size(); i++) {
             boolean check = true;
             for (int j = 0; j < samples.size(); j++) {
-                if(!samples.get(j).getMappedGeneUnitsList().contains(mutual_geneUnit.get(i)))
+                if(!samples.get(j).getFeature(EnumParams.GenesFeatureName).getFeatureMemebers().contains(mutual_geneUnit.get(i)))
                     check = false;
             }
             if (check)
@@ -168,8 +167,6 @@ public class EnumarationProcess_Quasi
         ArrayList<Sample> _samples; //will be relevant only for the leaf nodes
         //to avoid path to the root
 
-        int minNumOf_human_miRNAs = 2;
-        int minNumOf_viral_miRNAs = 1;
 
         Node clone;
 
@@ -225,7 +222,7 @@ public class EnumarationProcess_Quasi
         //
         public boolean isValid()
         {
-            return (this._mutual_geneUnit.size()>=minNumOf_human_miRNAs);
+            return (this._mutual_geneUnit.size()>=2);
         }
 
         private ArrayList<Node> getLeaves()

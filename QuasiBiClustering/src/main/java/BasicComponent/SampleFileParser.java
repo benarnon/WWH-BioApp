@@ -1,5 +1,8 @@
 package BasicComponent;
 
+import FeatureRelatedComponent.Symptom;
+import Mains.EnumParams;
+
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Date;
@@ -11,7 +14,7 @@ public class SampleFileParser {
     ArrayList<Sample> samples = new ArrayList<>();
     int numOfSample = 0;
 
-    public SampleFileParser(File file) throws IOException {
+    public SampleFileParser(File file) throws Exception {
         parse_sample_file(file);
     }
 
@@ -31,7 +34,7 @@ public class SampleFileParser {
         this.numOfSample = numOfSample;
     }
 
-    private void parse_sample_file(File file) throws IOException {
+    private void parse_sample_file(File file) throws Exception {
         FileReader fr = new FileReader(file);
         BufferedReader reader = new BufferedReader(fr);
         String nameLine = reader.readLine();
@@ -53,7 +56,16 @@ public class SampleFileParser {
             String[] symptoms = split[3].split(",");
 
 
-            sample = new Sample(SampleName,date,location,symptoms);
+            sample = new Sample(SampleName,date,location);
+
+            //Create the first feature Symptoms
+            sample.createNewFeature(EnumParams.GenesFeatureName);
+            sample.createNewFeature(EnumParams.SymptomsFeatureName);
+            for (int i = 0; i < symptoms.length; i++) {
+                Symptom sym = new Symptom(symptoms[i]);
+                sample.setMember(EnumParams.SymptomsFeatureName,sym);
+            }
+
             samples.add(sample);
             nameLine = reader.readLine();
 

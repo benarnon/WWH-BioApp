@@ -1,15 +1,12 @@
 package Enumeration;
 
 import BasicComponent.DatabaseIndex;
-import BasicComponent.GeneUnit;
+import FeatureRelatedComponent.GeneUnit;
 import BasicComponent.Sample;
 import junit.framework.TestCase;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
-
-import Enumeration.EnumarationProcess_Quasi.Node;
 
 public class EnumarationProcess_QuasiTest extends TestCase {
 

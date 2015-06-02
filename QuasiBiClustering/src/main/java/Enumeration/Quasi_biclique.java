@@ -3,7 +3,7 @@ package Enumeration;
 
 
 
-import BasicComponent.GeneUnit;
+import FeatureRelatedComponent.GeneUnit;
 import BasicComponent.Sample;
 
 import java.util.ArrayList;

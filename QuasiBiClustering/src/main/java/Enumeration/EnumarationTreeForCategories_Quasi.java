@@ -1,12 +1,10 @@
 package Enumeration;
 
 
-import BasicComponent.GeneUnit;
+import FeatureRelatedComponent.GeneUnit;
 import BasicComponent.Sample;
-import Mains.EnumParams;
 
 import java.util.ArrayList;
-import java.util.Stack;
 
 
 //Preparing everything that is needed to run the enumeration process on specific category GO/KEGG
@@ -18,7 +16,7 @@ public class EnumarationTreeForCategories_Quasi
     int _uniqueGenesInCatNum; //only different ENSG
     int _total_num_of_samples;//unique - for p-value
 
-    public ArrayList<Cluster> _clusters;//_cluster == good p_value
+    public ArrayList<Cluster> _clusters = new ArrayList<Cluster>();//_cluster == good p_value
     public int _allClusters,_uniqueClusters;
 
     public int numberOfGenes_allModules =0 ;

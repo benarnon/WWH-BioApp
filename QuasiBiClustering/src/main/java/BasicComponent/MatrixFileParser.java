@@ -1,6 +1,8 @@
 package BasicComponent;
 
 import Enumeration.Hit;
+import FeatureRelatedComponent.GeneUnit;
+import FeatureRelatedComponent.Member;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -34,12 +36,13 @@ public class MatrixFileParser {
     private ArrayList<Sample> samples = new ArrayList<>();
 
 
-    public MatrixFileParser(File file, ArrayList<GeneUnit> geneUnits, ArrayList<Sample> samples) throws IOException {
+    public MatrixFileParser(File file, ArrayList<Member> geneUnits, ArrayList<Sample> samples) throws IOException {
 
         FileReader fr = new FileReader(file);
         BufferedReader reader = new BufferedReader(fr);
         String nameLine = reader.readLine();
         //Get the matrix dimensions
+
         if (nameLine != null){
             String[] split = nameLine.split(" ");
             matrix = new Hit[Integer.parseInt(split[0])][Integer.parseInt(split[1])];
@@ -49,8 +52,8 @@ public class MatrixFileParser {
         nameLine = reader.readLine();
         if (nameLine != null){
             String[] SamplesName = nameLine.split("\t");
-            for (int i = 1; i < SamplesName.length; i++) {
-                this.samples.add(i-1, getSampleByName(samples, SamplesName[i]));
+            for (int i = 0; i < SamplesName.length; i++) {
+                this.samples.add(i, getSampleByName(samples, SamplesName[i]));
             }
 
         }
@@ -60,8 +63,8 @@ public class MatrixFileParser {
             String[] split = nameLine.split("\t");
             int l = split[0].split("\\|").length;
             this.geneUnits.add(i, getGenomeByName(geneUnits,split[0].split("\\|")[l-1].substring(1)));
-            for (int k = 1; k < split.length; k++) {
-                matrix[i][k-1] = new Hit(Float.parseFloat(split[k]));
+            for (int k = 2; k < split.length; k++) {
+                matrix[i][k-2] = new Hit(Float.parseFloat(split[k]));
             }
             i++;
             nameLine = reader.readLine();

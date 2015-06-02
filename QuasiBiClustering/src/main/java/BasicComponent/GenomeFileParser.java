@@ -1,5 +1,8 @@
 package BasicComponent;
 
+import FeatureRelatedComponent.GeneUnit;
+import FeatureRelatedComponent.Member;
+
 import java.io.*;
 import java.util.ArrayList;
 
@@ -7,7 +10,7 @@ import java.util.ArrayList;
  * Created by user on 5/10/15.
  */
 public class GenomeFileParser {
-    private ArrayList<GeneUnit> geneUnits = new ArrayList<>();
+    private ArrayList<Member> geneUnits = new ArrayList<>();
     private int numOfGenomes;
     public GenomeFileParser(File file) throws IOException {
         parse_genome_file(file);
@@ -54,7 +57,7 @@ public class GenomeFileParser {
 
     }
 
-    public ArrayList<GeneUnit> getGeneUnits() {
+    public ArrayList<Member> getGeneUnits() {
         return geneUnits;
     }
 }

@@ -1,6 +1,8 @@
 package BasicComponent;
 
-import java.util.ArrayList;
+import FeatureRelatedComponent.*;
+
+
 import java.util.Date;
 
 /**
@@ -10,34 +12,52 @@ public class Sample {
     private String sampleName;
     private Date date;
     private String location;
-    private String[] symptoms;
-    private ArrayList<GeneUnit> mappedGeneUnitsList = new ArrayList<>();
+    private int numOfFeatures = 0;
 
-    public Sample(String sampleName, Date date, String location, String[] symptoms) {
+    private FeatureArray featureArray = new FeatureArray();
+
+    public Sample(String sampleName, Date date, String location) {
         this.sampleName = sampleName;
         this.date = date;
         this.location = location;
-        this.symptoms = symptoms;
     }
 
     public Sample(String sampleName){
         this.sampleName = sampleName;
         this.date = null;
         this.location = null;
-        this.symptoms = null;
     }
 
-    public ArrayList<GeneUnit> getMappedGeneUnitsList() {
-        return mappedGeneUnitsList;
+    public void createNewFeature(String featureName, int index) throws Exception {
+        featureArray.createNewFeature(index, featureName);
+        numOfFeatures++;
     }
 
-    public void setMappedGeneUnitsList(ArrayList<GeneUnit> mappedGeneUnitsList) {
-        this.mappedGeneUnitsList = mappedGeneUnitsList;
+    public void createNewFeature(String featureName) throws Exception {
+        featureArray.createNewFeature(featureName);
+        numOfFeatures++;
+    }
+    public void addFeatrue(int index, feature fe){
+        featureArray.addFeature(index,fe);
     }
 
-    public void addGenome(GeneUnit geneUnit){
-        mappedGeneUnitsList.add(geneUnit);
+    public feature getFeature(String featureName){
+        return featureArray.getFeature(featureName);
     }
+
+    public Member getMember(String featureName,int memberIndex){
+        return featureArray.getMember(featureName,memberIndex);
+    }
+
+    public Member getMember(String featureName,String memberName){
+        return featureArray.getMember(featureName,memberName);
+    }
+
+    public void setMember(String featureName,Member member) throws Exception {
+        featureArray.addFeatureMemeber(featureName,member);
+    }
+
+
 
     public Date getDate() {
         return date;
@@ -63,11 +83,6 @@ public class Sample {
         this.location = location;
     }
 
-    public String[] getSymptoms() {
-        return symptoms;
-    }
 
-    public void setSymptoms(String[] symptoms) {
-        this.symptoms = symptoms;
-    }
+
 }

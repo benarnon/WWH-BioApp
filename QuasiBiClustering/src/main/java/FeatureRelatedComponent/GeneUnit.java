@@ -1,29 +1,28 @@
-package BasicComponent;
+package FeatureRelatedComponent;
 
-import java.util.ArrayList;
+import BasicComponent.DatabaseIndex;
 
 /**
  * Created by user on 5/10/15.
  */
-public class GeneUnit {
-    private String GenomeName;
+public class GeneUnit extends Member {
     private int length;
     private DatabaseIndex[] DbList;
 
 
 
     public GeneUnit(String genomeName, int length, DatabaseIndex[] dbList) {
-        GenomeName = genomeName;
+        super(genomeName);
         this.length = length;
         DbList = dbList;
     }
 
     public String getGenomeName() {
-        return GenomeName;
+        return getName();
     }
 
     public void setGenomeName(String genomeName) {
-        GenomeName = genomeName;
+        setName(genomeName);
     }
 
     public int getLength() {
