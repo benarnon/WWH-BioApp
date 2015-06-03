@@ -1,0 +1,30 @@
+	Sample2	Sample4	Sample6	Sample5
+gi|479155735|ref|NC_021015.1| Ruminococcus torques L2-14 draft genome	0.023670733	-0.10877758	-0.11751574	-0.09638864
+gi|134285789|gb|AAVM| Bacteroides caccae ATCC 43185 B_caccae-MSIQ, whole genome shotgun sequence	-0.003548883	-0.0051042587	-0.0038336702	-0.0054109544
+gi|392689812|gb|AGXX| Bacteroides uniformis CL03T00C23, whole genome shotgun sequence	8.1384555E-4	-0.0057579502	-0.0046592616	-0.007955331
+gi|29345410|ref|NC_004663.1| Bacteroides thetaiotaomicron VPI-5482 chromosome, complete genome	-0.07469219	-0.10973805	-0.10804486	-0.062360644
+gi|29611500|ref|NC_004703.1| Bacteroides thetaiotaomicron VPI-5482 plasmid p5482, complete sequence	-0.09080452	-0.15134084	-0.14831406	-0.024214506
+gi|123977278|gb|AAVN| Collinsella aerofaciens ATCC 25986 C_aerofaciens-2.0, whole genome shotgun sequence	-1.6393885E-4	-0.002008304	-0.0014754869	-6.9675595E-4
+gi|134285767|gb|AAXB| Dorea longicatena DSM 13814 D_longicatena-MSIQ, whole genome shotgun sequence	7.893387E-4	-0.0010295715	-0.003020076	4.1183084E-4
+gi|218556939|ref|NC_011742.1| Escherichia coli S88 chromosome, complete genome	-0.0077897236	0.059714623	0.073485754	0.055680655
+gi|218534477|ref|NC_011747.1| Escherichia coli S88 plasmid pECOS88, complete sequence	-0.00448253	-0.00448253	0.029136434	0.0037354417
+gi|144954990|gb|AAXE| Parabacteroides merdae ATCC 43184 P_merdae-MSIQ, whole genome shotgun sequence	-4.2871293E-4	-0.0011281911	-7.4460544E-4	-0.0019856151
+gi|479152295|ref|NC_021014.1| Ruminococcus sp. SR1/5 draft genome	0.03576255	-0.095724106	-0.10878253	-0.07155335
+gi|194733902|ref|NC_011094.1| Salmonella enterica subsp. enterica serovar Schwarzengrund str. CVM19633 chromosome, complete genome	-9.3436614E-4	0.0068590958	0.0058610234	0.0041197045
+gi|479176048|ref|NC_021022.1| Ruminococcus obeum A2-162 draft genome	0.026799798	-0.1060282	-0.12220919	-0.084311545
+gi|158931599|gb|ABFK| Alistipes putredinis DSM 17216 A_putredinis, whole genome shotgun sequence	0.0019216612	-0.006274812	-0.0068238564	-0.007294465
+gi|208429987|gb|ABVO| Bacteroides eggerthii DSM 20697 B_eggerthii, whole genome shotgun sequence	1.6835146E-4	-2.6455242E-4	3.1265058E-4	-2.4051405E-5
+gi|507752488|gb|ASSO| Bacteroides uniformis dnLKV2 acPFr, whole genome shotgun sequence	-0.0011617094	-0.0042734295	-0.00603674	-0.009023998
+gi|226331292|gb|ABWN| Butyrivibrio crossotus DSM 2876 B_crossotus-1.0, whole genome shotgun sequence	3.6249496E-4	-0.001691645	-0.0029805163	2.416633E-4
+gi|157102322|gb|ABEY| Coprococcus eutactus ATCC 27759 C_eutactus-2.0.1, whole genome shotgun sequence	-0.002353251	-0.004577562	-0.0076722503	-0.0068663433
+gi|407466711|ref|NC_018661.1| Escherichia coli O104:H4 str. 2009EL-2071 chromosome, complete genome	-0.00513874	0.8527862	0.9108181	0.7980671
+gi|407471876|ref|NC_018662.1| Escherichia coli O104:H4 str. 2009EL-2071 plasmid pAA-09EL71, complete sequence	0.007939346	1.2279518	1.3814458	1.1829622
+gi|218693476|ref|NC_011748.1| Escherichia coli 55989 chromosome, complete genome	-0.005528763	0.80062276	0.855988	0.7515235
+gi|479208076|ref|NC_021042.1| Faecalibacterium prausnitzii L2-6, complete genome	0.03381139	0.013669074	0.0031613708	-0.048293352
+gi|479150083|ref|NC_021013.1| Ruminococcus bromii L2-63 draft genome	0.033836007	-0.10839963	-0.1266737	-0.09719509
+gi|116326679|ref|NC_008500.1| Streptococcus thermophilus LMD-9 plasmid 1, complete sequence	0.112384796	0.067430854	-0.112384796	0.022476971
+gi|116626972|ref|NC_008532.1| Streptococcus thermophilus LMD-9, complete genome	0.03883922	-0.107575655	-0.1370418	-0.09119964
+gi|116326684|ref|NC_008501.1| Streptococcus thermophilus LMD-9 plasmid 2, complete sequence	-0.05950612	-0.38678965	-0.47604883	-0.05950612
+ENA|AB255436|AB255436.1 Stx2-converting phage 86 DNA, complete genome	-0.0049802465	0.25897273	0.2506723	0.2257711
+gi|383751989|ref|NC_017066.1| Rickettsia typhi str. TH1527 chromosome, complete genome	0.0	0.0	0.0	0.0
+

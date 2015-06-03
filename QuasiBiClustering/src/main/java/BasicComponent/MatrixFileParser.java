@@ -15,12 +15,15 @@ import java.util.ArrayList;
  */
 public class MatrixFileParser {
     private Hit[][] matrix;
+    private ArrayList<Member> geneUnits = new ArrayList<>();
+    private ArrayList<Sample> samples = new ArrayList<>();
 
-    public ArrayList<GeneUnit> getGeneUnits() {
+
+    public ArrayList<Member> getGeneUnits() {
         return geneUnits;
     }
 
-    public void setGeneUnits(ArrayList<GeneUnit> geneUnits) {
+    public void setGeneUnits(ArrayList<Member> geneUnits) {
         this.geneUnits = geneUnits;
     }
 
@@ -31,10 +34,6 @@ public class MatrixFileParser {
     public void setSamples(ArrayList<Sample> samples) {
         this.samples = samples;
     }
-
-    private ArrayList<GeneUnit> geneUnits = new ArrayList<>();
-    private ArrayList<Sample> samples = new ArrayList<>();
-
 
     public MatrixFileParser(File file, ArrayList<Member> geneUnits, ArrayList<Sample> samples) throws IOException {
 
@@ -99,10 +98,10 @@ public class MatrixFileParser {
         return null;
     }
 
-    private GeneUnit getGenomeByName(ArrayList<GeneUnit> geneUnits, String name){
+    private GeneUnit getGenomeByName(ArrayList<Member> geneUnits, String name){
         for (int i = 0; i < geneUnits.size(); i++) {
-            if (geneUnits.get(i).getGenomeName().equals(name))
-                return geneUnits.get(i);
+            if (geneUnits.get(i).getName().equals(name))
+                return (GeneUnit)geneUnits.get(i);
         }
         return null;
     }

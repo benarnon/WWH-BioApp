@@ -1,6 +1,7 @@
 package Enumeration;
 
 
+import FeatureRelatedComponent.FeatureArray;
 import FeatureRelatedComponent.GeneUnit;
 import BasicComponent.Sample;
 import Mains.EnumParams;
@@ -17,6 +18,7 @@ public class EnumarationProcess_Quasi
 
         ArrayList<Sample> _samples;
         ArrayList<GeneUnit> _geneUnits;
+        FeatureArray _featureArray;
 
         Clusters_Holder _cluster_holder;
         ArrayList<Cluster> _clusters;
@@ -26,9 +28,10 @@ public class EnumarationProcess_Quasi
 
         public ArrayList<Quasi_biclique> _quasi_bicliques = new ArrayList<Quasi_biclique>();
 
-    public void work(ArrayList<Sample> samples, ArrayList<GeneUnit> geneunits) throws Exception {
+    public void work(ArrayList<Sample> samples, FeatureArray featureArray) throws Exception {
        _samples = samples;
-       _geneUnits = geneunits;
+       _featureArray = featureArray;
+
 
         _cluster_holder = new Clusters_Holder();
 

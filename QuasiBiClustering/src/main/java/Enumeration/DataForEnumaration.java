@@ -4,6 +4,7 @@ package Enumeration;
 import BasicComponent.*;
 import FeatureRelatedComponent.FeatureArray;
 import FeatureRelatedComponent.GeneUnit;
+import FeatureRelatedComponent.Member;
 import Mains.EnumParams;
 
 import java.io.File;
@@ -40,7 +41,7 @@ public class DataForEnumaration
 
     }
 
-    private void parseMatrix(ArrayList<Sample> samples, ArrayList<GeneUnit> geneUnits) throws Exception {
+    private void parseMatrix(ArrayList<Sample> samples, ArrayList<Member> geneUnits) throws Exception {
         for (int i = 0; i < matrix.length; i++) {//for each geneUnit
             for (int j = 0; j < matrix[0].length; j++) {//for each sample
                 if (matrix[i][j].getScore()==1){
