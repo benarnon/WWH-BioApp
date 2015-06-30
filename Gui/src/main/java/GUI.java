@@ -155,10 +155,10 @@ public class GUI {
         BufferedReader br = null;
         try {
             if(i==1) {
-                br = new BufferedReader(new FileReader("/home/user/IdeaProjects/WWH-BIO/Gui/src/main/resources/EUindex.txt"));
+                br = new BufferedReader(new FileReader("/home/user/IdeaProjects/WWH-BioApp resources/resources/EUindex.txt"));
             }
             if(i==2){
-                br = new BufferedReader(new FileReader("/home/user/IdeaProjects/WWH-BIO/Gui/src/main/resources/EgyptIndex.txt"));
+                br = new BufferedReader(new FileReader("/home/user/IdeaProjects/WWH-BioApp resources/resources/EgyptIndex.txt"));
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -228,10 +228,10 @@ public class GUI {
         }
         Terminal.append("Convert query file succed\n");
         if(i==1) {
-            params2[0] = "/home/user/IdeaProjects/WWH-BIO/Gui/src/main/resources/EUdb.fa";
+            params2[0] = "/home/user/IdeaProjects/WWH-BioApp resources/resources/EUdb.fa";
         }
         if(i==2){
-            params2[0] = "/home/user/IdeaProjects/WWH-BIO/Gui/src/main/resources/EgyptDb.fa";
+            params2[0] = "/home/user/IdeaProjects/WWH-BioApp resources/resources//EgyptDb.fa";
         }
         params2[1] ="/home/user/IdeaProjects/WWH-BIO/out/VectorCreator/Vectors/" + SampleName.getText() +"/BinaryFiles/ref.br";
         params2[2] = "R";

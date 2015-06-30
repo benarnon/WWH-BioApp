@@ -4,7 +4,10 @@ package Enumeration;
 import FeatureRelatedComponent.FeatureArray;
 import FeatureRelatedComponent.GeneUnit;
 import BasicComponent.Sample;
+import FeatureRelatedComponent.Member;
+import FeatureRelatedComponent.feature;
 import Mains.EnumParams;
+import com.sun.org.apache.xalan.internal.utils.FeatureManager;
 
 import java.util.ArrayList;
 import java.util.Stack;
@@ -17,7 +20,6 @@ public class EnumarationProcess_Quasi
 {
 
         ArrayList<Sample> _samples;
-        ArrayList<GeneUnit> _geneUnits;
         FeatureArray _featureArray;
 
         Clusters_Holder _cluster_holder;
@@ -31,8 +33,6 @@ public class EnumarationProcess_Quasi
     public void work(ArrayList<Sample> samples, FeatureArray featureArray) throws Exception {
        _samples = samples;
        _featureArray = featureArray;
-
-
         _cluster_holder = new Clusters_Holder();
 
         construct_tree();
@@ -44,7 +44,7 @@ public class EnumarationProcess_Quasi
 
         Sample dummySample = new Sample("dummy");
         Node dummy = new Node(dummySample);
-        dummy._mutual_geneUnit = this._geneUnits;
+        dummy._mutual_feature_array = this._featureArray;
         dummy._leavesInSubtree.add(dummy);
         dummy._father = _treeRoot;
 
@@ -57,7 +57,7 @@ public class EnumarationProcess_Quasi
         Node node;
         for (int i = 0; i < _samples.size() ; i++) {
             sample = _samples.get(i);
-            if(sample.getFeature(EnumParams.GenesFeatureName).getFeatureMemebers().size() >= EnumParams.minNumOfGeneUnit){
+            if(sample.isValid()){
                 node = appendBrothers(sample);
                 if (node._children.size()>0)
                 {
@@ -91,11 +91,11 @@ public class EnumarationProcess_Quasi
             for (int j = 0; j < cloneBrother._leavesInSubtree.size(); j++) {
                 leaf = cloneBrother._leavesInSubtree.get(j);
                 leaf._samples.add(sample);
-                leaf._mutual_geneUnit = createMutualNew(leaf._samples,leaf._mutual_geneUnit);
+                leaf._mutual_feature_array = createMutualNew(leaf._samples,leaf._mutual_feature_array);
 
-                if(leaf._mutual_geneUnit.size() >= EnumParams.minNumOfGeneUnit){
+                if(leaf.isValid()){
                     if(leaf._samples.size() >= EnumParams.minNumOfSamples){
-                        generateCliques(leaf._samples,leaf._mutual_geneUnit);
+                        generateCliques(leaf._samples,leaf._mutual_feature_array);
                     }
                 }
 
@@ -114,19 +114,25 @@ public class EnumarationProcess_Quasi
         return node;
     }
 
-    private ArrayList<GeneUnit> createMutualNew(ArrayList<Sample> samples, ArrayList<GeneUnit> mutual_geneUnit) {
-        ArrayList<GeneUnit> ans = new ArrayList<GeneUnit>();
-        for (int i = 0; i < mutual_geneUnit.size(); i++) {
-            boolean check = true;
-            for (int j = 0; j < samples.size(); j++) {
-                if(!samples.get(j).getFeature(EnumParams.GenesFeatureName).getFeatureMemebers().contains(mutual_geneUnit.get(i)))
-                    check = false;
-            }
-            if (check)
-                ans.add(mutual_geneUnit.get(i));
+    private FeatureArray createMutualNew(ArrayList<Sample> samples, FeatureArray mutual_feature_array) throws Exception {
+        FeatureArray featureArray = new FeatureArray();
+        for (int l = 0; l < mutual_feature_array.getNumOfFeatures(); l++) {
+            feature fe = mutual_feature_array.getFeature(l);
+            featureArray.createNewFeature(fe.getFeatureName());
+            for (int i = 0; i < fe.getNumOfMember(); i++) {
+                boolean check = true;
+                Member me = fe.getMember(i);
+                for (int j = 0; j < samples.size(); j++) {
+                    feature f = samples.get(j).getFeature(l);
+                    if (!f.isContainByName(me))
+                        check = false;
+                }
+                if (check)
+                    featureArray.addFeatureMemeber(fe.getFeatureName(), fe.getMember(i));
 
+            }
         }
-        return ans;
+        return featureArray;
     }
 
     public boolean nested_deletePath(Node leaf){
@@ -138,13 +144,13 @@ public class EnumarationProcess_Quasi
     }
 
     public void nested_genrateCliques(ArrayList<Sample> x_new,
-                                      ArrayList<GeneUnit> mutual_human_mirs_new){
-        generateCliques(x_new,mutual_human_mirs_new);
+                                      FeatureArray mutual_feature_array){
+        generateCliques(x_new,mutual_feature_array);
     }
     private void generateCliques(ArrayList<Sample> x_new,
-                                 ArrayList<GeneUnit> mutual_human_mirs_new) {
-        Quasi_biclique clique = new Quasi_biclique(x_new,mutual_human_mirs_new);
-        _quasi_bicliques.add(clique);
+                                 FeatureArray mutual_feature_array) {
+        Quasi_biclique clique = new Quasi_biclique(x_new,mutual_feature_array);
+        addClique(clique);
 
 
     }
@@ -154,7 +160,42 @@ public class EnumarationProcess_Quasi
 
     }
     private void addClique(Quasi_biclique clique) {
+        //checks if there is a smaller biclique full contained in it, if so, removes it
+        //or this one if full contained in other
 
+        Quasi_biclique temp;
+        for(int i=0; i<_quasi_bicliques.size();i++)
+        {
+            temp = _quasi_bicliques.get(i);
+            boolean ans = true;
+            for (int j = 0; j <_featureArray.getNumOfFeatures(); j++) {
+                if(!twoListsAreEqual(temp._mutual_feature_array.getFeature(j),clique._mutual_feature_array.getFeature(j)))
+                    ans = false;
+                    break;
+            }
+            if(ans)
+            {
+                if(clique._samples.containsAll(temp._samples))
+                {
+                    _quasi_bicliques.remove(i);
+                    i--;
+                }
+                else if(temp._samples.containsAll(clique._samples))
+                    return;
+            }
+        }
+
+        _quasi_bicliques.add(clique);
+
+    }
+
+    private boolean twoListsAreEqual(feature list1, feature list2) {
+        if(list1.containsAllnames(list2) && list2.containsAllnames(list1))
+        {
+            //System.out.println(list1 + " " + list2);
+            return true;
+        }
+        else return false;
     }
 
 
@@ -165,7 +206,7 @@ public class EnumarationProcess_Quasi
         Node _father;
         ArrayList<Node> _leavesInSubtree;
         Sample _sample;
-        ArrayList<GeneUnit> _mutual_geneUnit;
+        FeatureArray _mutual_feature_array;
 
         ArrayList<Sample> _samples; //will be relevant only for the leaf nodes
         //to avoid path to the root
@@ -178,7 +219,7 @@ public class EnumarationProcess_Quasi
             _sample = sample;
             _children = new ArrayList<Node>();
             _leavesInSubtree = new ArrayList<Node>();
-            _mutual_geneUnit = new ArrayList<GeneUnit>();
+            _mutual_feature_array = new FeatureArray();
             _father = null;
         }
 
@@ -189,18 +230,24 @@ public class EnumarationProcess_Quasi
         protected Node clone()
         {
             Node newN = new Node(_sample);
+            boolean check = true;
             if (_children.size()==0) //leaf
             {
-                newN._mutual_geneUnit = new ArrayList<GeneUnit>();
+                newN._mutual_feature_array = new FeatureArray();
                 newN._samples = new ArrayList<Sample>();
-
-                for (int i=0; i<this._mutual_geneUnit.size();i++)
-                {
-                    newN._mutual_geneUnit.add(this._mutual_geneUnit.get(i));
-                }
-                for(int i=0; i<this._samples.size();i++)
-                {
-                    newN._samples.add(this._samples.get(i));
+                for (int j = 0; j <this._mutual_feature_array.getNumOfFeatures();  j++) {
+                    try {
+                        newN._mutual_feature_array.createNewFeature(_featureArray.getFeature(j).getFeatureName());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    for (int i = 0; i < this._mutual_feature_array.getFeature(j).getNumOfMember(); i++) {
+                        newN._mutual_feature_array.getFeature(j).addMember(this._mutual_feature_array.getFeature(j).cloneMember(i));
+                    }
+                    for (int i = 0; i < this._samples.size() && check; i++) {
+                        newN._samples.add(this._samples.get(i));
+                    }
+                    check = false;
                 }
             }
 
@@ -225,7 +272,11 @@ public class EnumarationProcess_Quasi
         //
         public boolean isValid()
         {
-            return (this._mutual_geneUnit.size()>=2);
+            for (int i = 0; i < this._mutual_feature_array.getNumOfFeatures(); i++) {
+                if(this._mutual_feature_array.getFeature(i).getNumOfMember() < EnumParams.minNumPerFeature[i])
+                    return false;
+            }
+            return true;
         }
 
         private ArrayList<Node> getLeaves()

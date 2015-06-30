@@ -1,6 +1,7 @@
 package Enumeration;
 
 
+import FeatureRelatedComponent.FeatureArray;
 import FeatureRelatedComponent.GeneUnit;
 import BasicComponent.Sample;
 
@@ -8,7 +9,7 @@ import java.util.ArrayList;
 
 public class Cluster
 {
-    public ArrayList<GeneUnit> _genesunit = new ArrayList<GeneUnit>();
+    public FeatureArray _featureArray = new FeatureArray();
     public ArrayList<Sample> _samples = new ArrayList<Sample>();
 
     public double _p_val;
@@ -17,8 +18,8 @@ public class Cluster
     public int _n;
     public int _g;
 
-    public Cluster(ArrayList<GeneUnit> _genesunit, ArrayList<Sample> _samples) {
-        this._genesunit = _genesunit;
+    public Cluster(FeatureArray _featureArray, ArrayList<Sample> _samples) {
+        this._featureArray = _featureArray;
         this._samples = _samples;
     }
 
@@ -29,5 +30,19 @@ public class Cluster
         this._t = t;
         this._n = n;
         this._g = g;
+    }
+
+    @Override
+    public String toString() {
+        String ans = "Samples in cluster: ";
+        for (int i = 0; i < _samples.size(); i++) {
+            ans = ans + _samples.get(i) + ",";
+        }
+        ans = ans + "\nFeatures:";
+        for (int i = 0; i < _featureArray.getNumOfFeatures(); i++) {
+            ans = ans +"\n"+  _featureArray.getFeature(i).toString();
+        }
+
+        return ans;
     }
 }

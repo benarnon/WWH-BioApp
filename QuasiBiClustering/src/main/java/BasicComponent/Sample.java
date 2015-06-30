@@ -1,6 +1,7 @@
 package BasicComponent;
 
 import FeatureRelatedComponent.*;
+import Mains.EnumParams;
 
 
 import java.util.Date;
@@ -45,6 +46,8 @@ public class Sample {
         return featureArray.getFeature(featureName);
     }
 
+
+    public feature getFeature(int l) {return featureArray.getFeature(l);}
     public Member getMember(String featureName,int memberIndex){
         return featureArray.getMember(featureName,memberIndex);
     }
@@ -55,6 +58,14 @@ public class Sample {
 
     public void setMember(String featureName,Member member) throws Exception {
         featureArray.addFeatureMemeber(featureName,member);
+    }
+
+    public boolean isValid(){
+        for (int i = 0; i < featureArray.getNumOfFeatures(); i++) {
+            if(featureArray.getFeature(i).getNumOfMember() < EnumParams.minNumPerFeature[i])
+                return false;
+        }
+        return true;
     }
 
 
@@ -83,6 +94,8 @@ public class Sample {
         this.location = location;
     }
 
-
-
+    @Override
+    public String toString() {
+        return sampleName ;
+    }
 }

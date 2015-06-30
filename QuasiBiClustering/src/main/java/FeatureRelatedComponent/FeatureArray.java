@@ -1,5 +1,8 @@
 package FeatureRelatedComponent;
 
+import Mains.EnumParams;
+import com.sun.org.apache.xalan.internal.utils.FeatureManager;
+
 import java.util.ArrayList;
 
 /**
@@ -25,10 +28,10 @@ public class FeatureArray {
 
     public void createNewFeature(String featureName) throws Exception {
         feature Feature;
-        if (featureName.equals("Symptoms")) {
+        if (featureName.equals(EnumParams.SymptomsFeatureName)) {
             Feature = new SymptomsFeature();
         }
-        else if(featureName.equals("GeneUnit")){
+        else if(featureName.equals(EnumParams.GenesFeatureName)){
             Feature = new GeneUnitFeature();
         }
         else{
@@ -46,7 +49,7 @@ public class FeatureArray {
         if(index == -1){
             throw new Exception("No such feature exist");
         }
-        FeaturesArray.get(index);
+        FeaturesArray.get(index).addMember(featureMemeber);
 
     }
 
@@ -80,8 +83,12 @@ public class FeatureArray {
     }
 
     public void setFeatureMemberArray(String featureName,ArrayList<Member> featureMemebers){
-        FeaturesArray.get(getFeatureIndex(featureName)).setFeatureMemebers(featureMemebers);
+        feature fe =  FeaturesArray.get(getFeatureIndex(featureName));
+        fe.setFeatureMemebers(featureMemebers);
     }
 
+    public int getNumOfFeatures(){
+        return FeaturesArray.size();
+    }
 
 }

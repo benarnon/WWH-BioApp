@@ -1,6 +1,7 @@
 package Enumeration;
 
 
+import FeatureRelatedComponent.FeatureArray;
 import FeatureRelatedComponent.GeneUnit;
 import BasicComponent.Sample;
 
@@ -11,7 +12,7 @@ public class Clusters_Holder
 {
     ArrayList<Cluster> _clusters = new ArrayList<Cluster>();
 
-    public void addCluster(ArrayList<GeneUnit> genes_unit, ArrayList<Sample> samples){
-        _clusters.add(new Cluster(genes_unit,samples));
+    public void addCluster(FeatureArray featureArray, ArrayList<Sample> samples){
+        _clusters.add(new Cluster(featureArray,samples));
     }
 }

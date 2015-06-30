@@ -7,23 +7,26 @@ import java.util.ArrayList;
  */
 public abstract class feature {
     protected ArrayList<Member> FeatureMemebers = new ArrayList<Member>();
-    protected  String featureNAme;
+    protected  String featureName;
 
-    public feature(String featureNAme) {
-        this.featureNAme = featureNAme;
+    public feature(String featureName) {
+        this.featureName = featureName;
     }
 
     public String getFeatureName() {
-        return featureNAme;
+        return featureName;
     }
 
     public void setFeatureName(String featureNAme) {
-        this.featureNAme = featureNAme;
+        this.featureName = featureNAme;
     }
 
     public Member getMember(int index){
         return FeatureMemebers.get(index);
     }
+
+    public abstract Member cloneMember(int index);
+
     public Member getMember(String name){
         return getMember(getMemberIndex(name));
     }
@@ -47,5 +50,34 @@ public abstract class feature {
 
     public void addMember(Member member){
         FeatureMemebers.add(member);
+    }
+
+    public int getNumOfMember(){
+        return FeatureMemebers.size();
+    }
+
+    public boolean isContainByName(Member me) {
+        for (int i = 0; i < FeatureMemebers.size(); i++) {
+            if (me.getName().equals(FeatureMemebers.get(i).getName()))
+                return true;
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        String ans = featureName + ": ";
+        for (int i = 0; i < FeatureMemebers.size(); i++) {
+            ans = ans + FeatureMemebers.get(i).getName() + ",";
+        }
+        return ans;
+    }
+
+    public boolean containsAllnames(feature fe2) {
+        for (int i = 0; i < fe2.getFeatureMemebers().size(); i++) {
+            if(!isContainByName(fe2.getMember(i)))
+                return false;
+        }
+        return true;
     }
 }

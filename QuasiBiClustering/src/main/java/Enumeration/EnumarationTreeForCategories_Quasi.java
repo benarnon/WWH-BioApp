@@ -1,6 +1,7 @@
 package Enumeration;
 
 
+import FeatureRelatedComponent.FeatureArray;
 import FeatureRelatedComponent.GeneUnit;
 import BasicComponent.Sample;
 
@@ -11,7 +12,7 @@ import java.util.ArrayList;
 public class EnumarationTreeForCategories_Quasi
 {
     ArrayList<Sample> _samplesInCat;
-    ArrayList<GeneUnit> _geneUnits;
+    FeatureArray _featureArray = new FeatureArray();
 
     int _uniqueGenesInCatNum; //only different ENSG
     int _total_num_of_samples;//unique - for p-value
@@ -36,13 +37,14 @@ public class EnumarationTreeForCategories_Quasi
 
 
     public EnumarationTreeForCategories_Quasi(DataForEnumaration data, ArrayList samplesInCat) throws Exception {
+
         _data = data;
 
         _samplesInCat = samplesInCat;
         _total_num_of_samples = data.getSamples().size();
 
         EnumarationProcess_Quasi ep = new EnumarationProcess_Quasi();
-        ep.work(_samplesInCat,_data.getGeneUnitList());
+        ep.work(_samplesInCat,_data.getFeatureArray());
         ArrayList<Quasi_biclique> cliques = ep._quasi_bicliques;
 
         System.out.println("NUMBER OF CLIQUES " + cliques.size());
@@ -52,7 +54,7 @@ public class EnumarationTreeForCategories_Quasi
         Quasi_biclique clique;
         for (int i = 0; i < cliques.size(); i++) {
             clique = cliques.get(i);
-            Cluster cluster = new Cluster(clique._mutual_geneunit,clique._samples);
+            Cluster cluster = new Cluster(clique._mutual_feature_array,clique._samples);
             _clusters.add(cluster);
         }
 
@@ -67,5 +69,15 @@ public class EnumarationTreeForCategories_Quasi
 
     public ArrayList<Cluster> get_clusters() {
         return _clusters;
+    }
+
+    public String printCluster() {
+        String ans = "";
+        for (int i = 0; i <_clusters.size() ; i++) {
+            int j = i+1;
+            ans = ans +"Cluster number " + j + "\n" + _clusters.get(i).toString() +"\n";
+        }
+
+        return  ans;
     }
 }

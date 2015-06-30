@@ -1,5 +1,7 @@
 package FeatureRelatedComponent;
 
+import Mains.EnumParams;
+
 import java.util.ArrayList;
 
 /**
@@ -7,8 +9,16 @@ import java.util.ArrayList;
  */
 public class SymptomsFeature extends feature {
     public SymptomsFeature() {
-        super("Symptoms");
+        super(EnumParams.SymptomsFeatureName);
         FeatureMemebers = new ArrayList<Member>();
+    }
+
+    @Override
+    public Member cloneMember(int index) {
+        Symptom symptom = (Symptom)FeatureMemebers.get(index);
+
+        Member ans = new Symptom(symptom.getName());
+        return ans;
     }
 
     @Override
