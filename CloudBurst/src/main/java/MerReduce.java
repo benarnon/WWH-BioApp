@@ -13,6 +13,7 @@ import java.util.List;
 
 //import org.apache.hadoop.io.RawComparator;
 
+//TODO migrate to yarn
 
 public class MerReduce {
 	

@@ -1,4 +1,5 @@
 import org.apache.hadoop.io.Text;
+//TODO migrate to yarn
 
 public class SubstringTester {
 	

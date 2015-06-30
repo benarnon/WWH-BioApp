@@ -6,7 +6,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.*;
 
 import java.io.IOException;
-
+//TODO migrate to yarn
 public class CloudBurst {	
 	
 	// Make sure this number is longer than the longest read

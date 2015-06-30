@@ -4,6 +4,7 @@ import org.apache.hadoop.mapred.*;
 
 import java.io.IOException;
 import java.util.Iterator;
+//TODO migrate to yarn
 
 public class FilterAlignments 
 {

@@ -11,6 +11,7 @@ import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapred.JobConf;
 
 import java.io.FileWriter;
+//TODO migrate to yarn
 
 public class DisplaySequenceFile {
    public static void main(String[] args) throws Exception
