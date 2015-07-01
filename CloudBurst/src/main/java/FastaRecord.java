@@ -1,7 +1,7 @@
 import org.apache.hadoop.io.BytesWritable;
 
 import java.io.IOException;
-//TODO migrate to yarn
+//TODO migrate to yarn - DONE
 
 public class FastaRecord 
 {	

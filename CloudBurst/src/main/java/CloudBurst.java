@@ -16,7 +16,7 @@ import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 
 
 import java.io.IOException;
-//TODO migrate to yarn
+//TODO migrate to yarn -DONE
 public class CloudBurst {	
 	
 	// Make sure this number is longer than the longest read

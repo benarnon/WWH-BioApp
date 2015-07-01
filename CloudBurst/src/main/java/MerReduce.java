@@ -2,7 +2,16 @@ import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.io.WritableComparator;
-import org.apache.hadoop.mapred.*;
+import org.apache.hadoop.mapreduce.*;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
+
+import org.apache.hadoop.conf.Configuration;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -32,8 +41,7 @@ public class MerReduce {
 	
 	//------------------------- MapClass --------------------------
 	
-	public static class MapClass extends MapReduceBase implements
-			Mapper<IntWritable, BytesWritable, BytesWritable, BytesWritable> 
+	public static class MapClass extends Mapper<IntWritable, BytesWritable, BytesWritable, BytesWritable>
 	{
 		private FastaRecord record = new FastaRecord();
 		private BytesWritable seed = new BytesWritable();
@@ -55,7 +63,7 @@ public class MerReduce {
 		//------------------------- configure --------------------------
 		// Set runtime parameters
 		
-		public void configure(JobConf conf) 
+		public void configure(Configuration conf)
 		{
 			curfile = conf.get("map.input.file");
 			refpath = conf.get("refpath");
@@ -73,10 +81,7 @@ public class MerReduce {
 
 		
 		//------------------------- map --------------------------
-		public void map(IntWritable id, BytesWritable rawRecord,
-				        OutputCollector<BytesWritable, BytesWritable> output, 
-				        Reporter reporter) throws IOException 
-		{
+		public void map(IntWritable id, BytesWritable rawRecord,Context context) throws IOException, InterruptedException {
 			record.fromBytes(rawRecord);
 
 
@@ -138,7 +143,7 @@ public class MerReduce {
 							DNAString.arrToSeed(seq, start, SEED_LEN, seedbuffer, 0, r, REDUNDANCY, 0);
 							seed.set(seedbuffer, 0, seedbuffer.length);
 
-							output.collect(seed, seedbinary);
+							context.write(seed, seedbinary);
 						}
 					}
 					else
@@ -146,7 +151,7 @@ public class MerReduce {
 						DNAString.arrToSeed(seq, start, SEED_LEN, seedbuffer, 0, 0, REDUNDANCY, 0);
 						seed.set(seedbuffer, 0, seedbuffer.length);
 
-						output.collect(seed, seedbinary);						
+						context.write(seed, seedbinary);
 					}
 				}
 			}
@@ -210,7 +215,7 @@ public class MerReduce {
 						int rightstart = i+SEED_LEN;
 						int rightlen = seqlen-rightstart;
 
-						output.collect(seed, seedInfo.toBytes(seq, leftstart, leftlen, rightstart, rightlen));
+						context.write(seed, seedInfo.toBytes(seq, leftstart, leftlen, rightstart, rightlen));
 					}
 				}
 			}
@@ -219,11 +224,11 @@ public class MerReduce {
 	
 	
 	// -- Use a customer partitioner so reference and qry seeds will be grouped together
-	public static class PartitionMers implements Partitioner<BytesWritable, BytesWritable>
+	public static class PartitionMers extends Partitioner<BytesWritable, BytesWritable>
 	{
 		private static int seedlen;
 		
-		public void configure(JobConf conf)
+		public void configure(Configuration conf)
 		{
 			int SEED_LEN     = Integer.parseInt(conf.get("SEED_LEN"));
 			int REDUNDANCY   = Integer.parseInt(conf.get("REDUNDANCY"));
@@ -323,8 +328,7 @@ public class MerReduce {
 
 	
 	//------------------------- ReduceClass --------------------------
-	public static class ReduceClass extends MapReduceBase implements
-			Reducer<BytesWritable, BytesWritable, IntWritable, BytesWritable> 
+	public static class ReduceClass extends Reducer<BytesWritable, BytesWritable, IntWritable, BytesWritable>
 	{
 		private static AlignmentRecord noalignment = new AlignmentRecord(-1, -1, -1, -1, true);
 		private static AlignmentRecord fullalignment = new AlignmentRecord();
@@ -348,7 +352,7 @@ public class MerReduce {
 		//------------------------- configure --------------------------	
 		// Get the runtime parameters
 		
-		public void configure(JobConf conf) 
+		public void configure(Configuration conf)
 		{				
 			K                 = Integer.parseInt(conf.get("K"));
 			SEED_LEN          = Integer.parseInt(conf.get("SEED_LEN"));
@@ -378,9 +382,7 @@ public class MerReduce {
 		//------------------------- extend --------------------------
 		// Given an exact shared seed, try to extend to a full length alignment
 		
-		public static AlignmentRecord extend(MerRecord qrytuple, MerRecord reftuple,
-						                     OutputCollector<IntWritable, BytesWritable> output, 
-						                     Reporter reporter) throws IOException 
+		public static AlignmentRecord extend(MerRecord qrytuple, MerRecord reftuple,Context context) throws IOException
 		{
 			int refStart    = reftuple.offset;
 			int refEnd      = reftuple.offset + SEED_LEN;
@@ -434,10 +436,8 @@ public class MerReduce {
 		
 		
 		//------------------------- reduce --------------------------
-		public synchronized void reduce(BytesWritable mer, Iterator<BytesWritable> values,
-										OutputCollector<IntWritable, BytesWritable> output, Reporter reporter)
-										throws IOException 
-		{
+		public synchronized void reduce(BytesWritable mer, Iterator<BytesWritable> values,Context context)
+                throws IOException, InterruptedException {
 			Timer timer = new Timer();
 			
 			reftuples.clear();
@@ -496,7 +496,7 @@ public class MerReduce {
 					
 					if (qbatch == BLOCK_SIZE)
 					{
-						alignBatch(output, reporter);
+						alignBatch(context);
 					
 						qrytuples.clear();
 						qbatch = 0;
@@ -506,18 +506,17 @@ public class MerReduce {
 			
 			if (qbatch != 0)
 			{
-				alignBatch(output, reporter);
+				alignBatch(context);
 			}
 			
 			if (verbose)
 			{
-				reporter.setStatus(seedstr + " : " + totalr + " x " + totalq + " = " + totalr*totalq + " " + timer.get());
+				//reporter.setStatus(seedstr + " : " + totalr + " x " + totalq + " = " + totalr*totalq + " " + timer.get());TODO reporter need to be changed to mv2
 				System.err.println(seedstr + " : " + totalr + " x " + totalq + " = " + totalr*totalq + " " + timer.get());
 			}
 		}
 		
-		public static void alignBatch(OutputCollector<IntWritable, BytesWritable> output, Reporter reporter) throws IOException
-		{
+		public static void alignBatch(Context context) throws IOException, InterruptedException {
 			int numr = reftuples.size();
 			int numq = qrytuples.size();
 
@@ -550,7 +549,7 @@ public class MerReduce {
 							// for each element in [startr, lastr)
 							for (int curr = startr; curr < lastr; curr++)
 							{
-								AlignmentRecord rec = extend(qry, reftuples.get(curr), output, reporter);
+								AlignmentRecord rec = extend(qry, reftuples.get(curr), context);
 								
 								if (rec.m_differences == -1) continue;
 								
@@ -572,7 +571,7 @@ public class MerReduce {
 								else
 								{
 									qryid.set(qry.id);
-									output.collect(qryid, fullalignment.toBytes());
+									context.write(qryid, fullalignment.toBytes());
 								}
 							}
 						}
@@ -585,11 +584,11 @@ public class MerReduce {
 							if (bestk[qidx] <= K)
 							{
 								qryid.set(qrytuples.get(qidx+startq).id);
-								output.collect(qryid, bestalignments[qidx].toBytes());
+								context.write(qryid, bestalignments[qidx].toBytes());
 								
 								if (recordsecond[qidx])
 								{
-									output.collect(qryid, secondalignments[qidx].toBytes());
+									context.write(qryid, secondalignments[qidx].toBytes());
 								}
 							}
 						}

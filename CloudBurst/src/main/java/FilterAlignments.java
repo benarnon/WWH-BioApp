@@ -1,21 +1,24 @@
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.mapred.*;
-
+import org.apache.hadoop.mapreduce.*;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import java.io.IOException;
 import java.util.Iterator;
-//TODO migrate to yarn
+//TODO migrate to yarn-DONE
 
 public class FilterAlignments 
 {
 	// Identity mapper
-	public static class FilterMapClass extends MapReduceBase implements
-				        Mapper<IntWritable, BytesWritable, IntWritable, BytesWritable> 
+	public static class FilterMapClass extends Mapper<IntWritable, BytesWritable, IntWritable, BytesWritable>
 	{
-		public void map(IntWritable readid, BytesWritable rawAlignment,
-					OutputCollector<IntWritable, BytesWritable> output, Reporter reporter) throws IOException 
-		{
-			output.collect(readid, rawAlignment);
+		public void map(IntWritable readid, BytesWritable rawAlignment,Context context) throws IOException, InterruptedException {
+			context.write(readid, rawAlignment);
 		}
 	}
 
@@ -24,16 +27,13 @@ public class FilterAlignments
 	// Should have good speedup, since an arbitrarily long list is reduced to just 2 items
 	// Can't just record the top 1, because then it might be lost that number 1 is a tie
 	// Must output at least the top 1, or a second best alignment might be recorded instead
-	public static class FilterCombinerClass extends MapReduceBase implements
-						Reducer<IntWritable, BytesWritable, IntWritable, BytesWritable> 
+	public static class FilterCombinerClass extends Reducer<IntWritable, BytesWritable, IntWritable, BytesWritable>
 	{
 		private static AlignmentRecord bestAlignment = new AlignmentRecord();
 		private static AlignmentRecord curAlignment  = new AlignmentRecord();
 		private static AlignmentRecord secondBest    = new AlignmentRecord();
 
-		public synchronized void reduce(IntWritable readid, Iterator<BytesWritable> values,
-										OutputCollector<IntWritable, BytesWritable> output, Reporter reporter) throws IOException 
-		{
+		public synchronized void reduce(IntWritable readid, Iterator<BytesWritable> values,Context context) throws IOException, InterruptedException {
 			boolean recordSecond = false;
 			bestAlignment.fromBytes(values.next());
 
@@ -57,26 +57,23 @@ public class FilterAlignments
 				}
 			}
 			
-			output.collect(readid, bestAlignment.toBytes());
+			context.write(readid, bestAlignment.toBytes());
 			
 			if (recordSecond)
 			{
-				output.collect(readid, secondBest.toBytes());
+				context.write(readid, secondBest.toBytes());
 			}
 		}
 	}	
 
 	
 	// if there is a unique best alignment, record that alignment
-	public static class FilterReduceClass extends MapReduceBase implements
-		         		Reducer<IntWritable, BytesWritable, IntWritable, BytesWritable> 
+	public static class FilterReduceClass extends Reducer<IntWritable, BytesWritable, IntWritable, BytesWritable>
 	{
 		private static AlignmentRecord bestAlignment = new AlignmentRecord();
 		private static AlignmentRecord curAlignment = new AlignmentRecord();
 				
-		public synchronized void reduce(IntWritable readid, Iterator<BytesWritable> values,
-		  			             OutputCollector<IntWritable, BytesWritable> output, Reporter reporter) throws IOException 
-		{
+		public synchronized void reduce(IntWritable readid, Iterator<BytesWritable> values,Context context) throws IOException, InterruptedException {
 			boolean recordBest = true;
 			bestAlignment.fromBytes(values.next());
 						
@@ -102,7 +99,7 @@ public class FilterAlignments
 			
 			if (recordBest)
 			{
-				output.collect(readid, bestAlignment.toBytes());
+				context.write(readid, bestAlignment.toBytes());
 			}
 		}
 	}	

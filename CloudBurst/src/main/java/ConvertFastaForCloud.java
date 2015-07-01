@@ -6,7 +6,7 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.SequenceFile.Writer;
 import org.apache.hadoop.mapreduce.*;
-//TODO migrate to yarn
+//TODO migrate to yarn- DONE
 import java.io.*;
 
 

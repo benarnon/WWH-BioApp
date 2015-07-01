@@ -8,10 +8,11 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapreduce.*;
+import org.apache.hadoop.conf.Configuration;
 
 import java.io.FileWriter;
-//TODO migrate to yarn
+//TODO migrate to yarn - DONE
 
 public class DisplaySequenceFile {
    public static void main(String[] args) throws Exception
@@ -38,7 +39,10 @@ public class DisplaySequenceFile {
 		
 		
        Path thePath = new Path(filename);
-       JobConf conf = new JobConf(DisplaySequenceFile.class);
+       //JobConf conf = new JobConf(DisplaySequenceFile.class);
+       Configuration conf = new Configuration(true);//mv2
+       Job job =new Job(conf,"DisplatSequence");//mv2
+       job.setJarByClass(DisplaySequenceFile.class);//mv2
        
        SequenceFile.Reader theReader = new SequenceFile.Reader(FileSystem.get(conf), thePath, conf);
        
