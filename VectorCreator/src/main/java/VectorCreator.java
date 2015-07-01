@@ -1,11 +1,14 @@
 
 
+
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.MapReduceBase;
-import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.Reporter;
+import org.apache.hadoop.mapreduce.*;
+import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
+
+
 
 
 import java.io.*;
@@ -106,8 +109,7 @@ public class VectorCreator {
         return -1;
     }
 
-    public static class ClusterMapper extends MapReduceBase
-            implements org.apache.hadoop.mapred.Mapper<LongWritable, Text, Text, IntWritable>{
+    public static class ClusterMapper extends Mapper<LongWritable, Text, Text, IntWritable>{
         private final static IntWritable one = new IntWritable(1);
         private Text sampleID = new Text();
 
@@ -118,23 +120,21 @@ public class VectorCreator {
 
 
         @Override
-        public void map(LongWritable key, Text value, OutputCollector<Text, IntWritable> outputCollector, Reporter reporter) throws IOException {
+        public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
             String[] splits = (value.toString()).split("\t");
             sampleID.set(splits[0]);
-            outputCollector.collect(sampleID, one);
+            context.write(sampleID, one);
         }
 
     }
 
 
-    public static class ClusterReducer extends MapReduceBase
-            implements org.apache.hadoop.mapred.Reducer<Text,IntWritable,Text,IntWritable> {
+    public static class ClusterReducer extends Reducer<Text,IntWritable,Text,IntWritable> {
         private IntWritable result = new IntWritable();
 
 
 
-        @Override
-        public void reduce(Text key, Iterator<IntWritable> values, OutputCollector<Text, IntWritable> outputCollector, Reporter reporter) throws IOException {
+        public void reduce(Text key, Iterator<IntWritable> values, Context context) throws IOException, InterruptedException {
             int sum = 0;
             while (values.hasNext()) {
                 sum += values.next().get();
@@ -145,7 +145,7 @@ public class VectorCreator {
             Text outKey = new Text();
             outKey.set(key.toString());
             outKey.set(outKey.toString());
-            outputCollector.collect(outKey, result);
+            context.write(outKey, result);
         }
     }
 
