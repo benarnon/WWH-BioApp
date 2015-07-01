@@ -1,10 +1,11 @@
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.SequenceFile.Writer;
-import org.apache.hadoop.mapred.JobConf;
+import org.apache.hadoop.mapreduce.*;
 //TODO migrate to yarn
 import java.io.*;
 
@@ -161,7 +162,7 @@ public class ConvertFastaForCloud {
 		
 		System.err.println("Converting " + infile + " into " + outfile);
 		
-		JobConf config = new JobConf();
+		Configuration config = new Configuration(true);
 		
 		SequenceFile.Writer writer = SequenceFile.createWriter(FileSystem.get(config), config,
 				new Path(outfile), IntWritable.class, BytesWritable.class);

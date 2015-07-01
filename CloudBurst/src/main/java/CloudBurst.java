@@ -1,9 +1,19 @@
+import org.apache.avro.mapreduce.AvroSequenceFileOutputFormat;
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.*;
+import org.apache.hadoop.io.BytesWritable;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
+
+
 
 import java.io.IOException;
 //TODO migrate to yarn
@@ -11,13 +21,12 @@ public class CloudBurst {
 	
 	// Make sure this number is longer than the longest read
 	public static final int CHUNK_OVERLAP = 1024;
-    public static RunningJob rj;
 	//------------------------- alignall --------------------------
 	// Setup and run the hadoop job for running the alignment
 
 
 
-    public static RunningJob alignall(String refpath,
+    public static void alignall(String refpath,
                                       String qrypath,
                                       String outpath,
                                       int MIN_READ_LEN,
@@ -50,18 +59,23 @@ public class CloudBurst {
 		System.out.println("BLOCK_SIZE: "        + BLOCK_SIZE);
 		System.out.println("REDUNDANCY: "        + REDUNDANCY);
 		
-		JobConf conf = new JobConf(MerReduce.class);
-		conf.setJobName("CloudBurst");
-		conf.setNumMapTasks(NUM_MAP_TASKS);
-		conf.setNumReduceTasks(NUM_REDUCE_TASKS);
+		Configuration conf = new Configuration(true);
+
+        Job job = new Job(conf,"CloudBurst");
+		//conf.setJobName("CloudBurst"); MV1
+        job.setNumReduceTasks(NUM_REDUCE_TASKS); // MV2
+
+		//conf.setNumMapTasks(NUM_MAP_TASKS); TODO find solution for mv2
+		//conf.setNumReduceTasks(NUM_REDUCE_TASKS);MV1
 
 		// old style
 		//conf.addInputPath(new Path(refpath));
 		//conf.addInputPath(new Path(qrypath));
 		
 		// new style
-		FileInputFormat.addInputPath(conf, new Path(refpath));
-		FileInputFormat.addInputPath(conf, new Path(qrypath));
+
+		FileInputFormat.addInputPath(job, new Path(refpath));
+		FileInputFormat.addInputPath(job, new Path(qrypath));
 
 		conf.set("refpath",           refpath);
 		conf.set("qrypath",           qrypath);
@@ -74,33 +88,47 @@ public class CloudBurst {
 		conf.set("BLOCK_SIZE",        Integer.toString(BLOCK_SIZE));
 		conf.set("REDUNDANCY",        Integer.toString(REDUNDANCY));
 		conf.set("FILTER_ALIGNMENTS", (FILTER_ALIGNMENTS ? "1" : "0"));
+
+        job.setMapperClass(MerReduce.MapClass.class);
+		//conf.setMapperClass(MerReduce.MapClass.class);
 		
-		conf.setMapperClass(MerReduce.MapClass.class);
-		
-		conf.setInputFormat(SequenceFileInputFormat.class);			
-		conf.setMapOutputKeyClass(BytesWritable.class);
-		conf.setMapOutputValueClass(BytesWritable.class);
+		job.setInputFormatClass(SequenceFileInputFormat.class);
+        //conf.setInputFormat(SequenceFileInputFormat.class);
+
+        job.setMapOutputKeyClass(BytesWritable.class);//mv2
+        //conf.setMapOutputKeyClass(BytesWritable.class);mv1
+
+        job.setMapOutputValueClass(BytesWritable.class);//mv2
+		//conf.setMapOutputValueClass(BytesWritable.class);mv1
 
 		// The order of seeds is not important, but make sure the reference seeds are seen before the qry seeds
-		conf.setPartitionerClass(MerReduce.PartitionMers.class); 
-		conf.setOutputValueGroupingComparator(MerReduce.GroupMersWC.class);
+		job.setPartitionerClass(MerReduce.PartitionMers.class); // mv2
+        //conf.setPartitionerClass(MerReduce.PartitionMers.class);
+		job.setGroupingComparatorClass(MerReduce.GroupMersWC.class); //mv2 TODO
+        //conf.setOutputValueGroupingComparator(MerReduce.GroupMersWC.class);
 		
-		conf.setReducerClass(MerReduce.ReduceClass.class);
-		conf.setOutputKeyClass(IntWritable.class);
-		conf.setOutputValueClass(BytesWritable.class);
-		conf.setOutputFormat(SequenceFileOutputFormat.class);
-		
+		job.setReducerClass(MerReduce.ReduceClass.class);
+        //conf.setReducerClass(MerReduce.ReduceClass.class);
+		//conf.setOutputKeyClass(IntWritable.class);
+        job.setOutputKeyClass(IntWritable.class);
+
+        //conf.setOutputValueClass(BytesWritable.class);
+        job.setOutputValueClass(BytesWritable.class);
+
+        //conf.setOutputFormat(SequenceFileOutputFormat.class);
+        job.setOutputFormatClass(SequenceFileOutputFormat.class);
 		
 		Path oPath = new Path(outpath);
 		//conf.setOutputPath(oPath);
-		FileOutputFormat.setOutputPath(conf, oPath);
+		FileOutputFormat.setOutputPath(job, oPath);
 		System.err.println("  Removing old results");
 		FileSystem.get(conf).delete(oPath);
 
-        rj = JobClient.runJob(conf);
+
+        //JobClient rj = JobClient.runJob(conf);
+        int code = job.waitForCompletion(true) ? 0 : 1;
 
 		System.err.println("CloudBurst Finished");
-		return rj;
 	}
 	
 	
@@ -114,39 +142,72 @@ public class CloudBurst {
     {
 		System.out.println("NUM_FMAP_TASKS: "     + nummappers);
 		System.out.println("NUM_FREDUCE_TASKS: "  + numreducers);
-		
-		JobConf conf = new JobConf(FilterAlignments.class);
-		conf.setJobName("FilterAlignments");
-		conf.setNumMapTasks(nummappers);
-		conf.setNumReduceTasks(numreducers);
+
+        // Create configuration
+        Configuration conf = new Configuration(true);//mv2
+
+        // Create job
+        Job job = new Job(conf, "WordCount");//mv2
+        job.setJarByClass(FilterAlignments.class);//mv2
+
+
+        //JobConf conf = new JobConf(FilterAlignments.class);//mv1
+		//conf.setJobName("FilterAlignments");//mv1
+
+        job.setNumReduceTasks(numreducers);//mv2
+		//conf.setNumMapTasks(nummappers);//TODO find solution for mv2
+		//conf.setNumReduceTasks(numreducers);//mv1
 		
 		// old style
 		//conf.addInputPath(new Path(alignpath));
-		FileInputFormat.addInputPath(conf, new Path(alignpath));
-		
-		conf.setMapperClass(FilterAlignments.FilterMapClass.class);
-		
-		conf.setInputFormat(SequenceFileInputFormat.class);			
-		conf.setMapOutputKeyClass(IntWritable.class);
-		conf.setMapOutputValueClass(BytesWritable.class);
-		
-		conf.setCombinerClass(FilterAlignments.FilterCombinerClass.class);
-		
-		conf.setReducerClass(FilterAlignments.FilterReduceClass.class);
-		conf.setOutputKeyClass(IntWritable.class);
-		conf.setOutputValueClass(BytesWritable.class);
-		conf.setOutputFormat(SequenceFileOutputFormat.class);
+		FileInputFormat.addInputPath(job, new Path(alignpath));
+
+        job.setMapperClass(FilterAlignments.FilterMapClass.class);//mv2
+        //conf.setMapperClass(FilterAlignments.FilterMapClass.class);//mv1
+
+        job.setInputFormatClass(SequenceFileInputFormat.class);//mv2
+        //conf.setInputFormat(SequenceFileInputFormat.class);mv1
+
+        job.setMapOutputKeyClass(IntWritable.class);//mv2
+        //conf.setMapOutputKeyClass(IntWritable.class);mv1
+
+        job.setMapOutputValueClass(BytesWritable.class);//mv2
+        //conf.setMapOutputValueClass(BytesWritable.class);mv1
+
+        job.setInputFormatClass(SequenceFileInputFormat.class);//mv2
+        //conf.setInputFormat(SequenceFileInputFormat.class);mv1
+
+        job.setMapOutputKeyClass(IntWritable.class);
+        //conf.setMapOutputKeyClass(IntWritable.class);
+
+        job.setMapOutputValueClass(BytesWritable.class);
+        //conf.setMapOutputValueClass(BytesWritable.class);
+
+        job.setCombinerClass(FilterAlignments.FilterCombinerClass.class);
+        //conf.setCombinerClass(FilterAlignments.FilterCombinerClass.class);
+
+        job.setReducerClass(FilterAlignments.FilterReduceClass.class);
+        //conf.setReducerClass(FilterAlignments.FilterReduceClass.class);
+
+        job.setOutputKeyClass(IntWritable.class);
+        //conf.setOutputKeyClass(IntWritable.class);
+
+        job.setOutputValueClass(BytesWritable.class);
+        //conf.setOutputValueClass(BytesWritable.class);
+
+        job.setOutputFormatClass(SequenceFileOutputFormat.class);
+        //conf.setOutputFormat(SequenceFileOutputFormat.class);
 
 		Path oPath = new Path(outpath);
-		FileOutputFormat.setOutputPath(conf, oPath);
+		FileOutputFormat.setOutputPath(job, oPath);
 		//conf.setOutputPath(oPath);
 		System.err.println("  Removing old results");
 		FileSystem.get(conf).delete(oPath);
-		
-		
-		JobClient.runJob(conf);
-		
-		System.err.println("FilterAlignments Finished");		
+
+        //JobClient rj = JobClient.runJob(conf);
+        int code = job.waitForCompletion(true) ? 0 : 1;
+
+		System.err.println("FilterAlignments Finished");
     }
 
 

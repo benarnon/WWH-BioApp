@@ -3,17 +3,24 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.*;
+import org.apache.hadoop.mapreduce.*;
+import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
+import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 //TODO migrate to yarn
 
+import org.apache.hadoop.conf.Configuration;
 import java.io.IOException;
 import java.util.Iterator;
 
 
 public class CountKmers {
 		
-		public static class MerMapClass extends MapReduceBase implements
-				Mapper<IntWritable, BytesWritable, BytesWritable, IntWritable> 
+		public static class MerMapClass extends Mapper<IntWritable, BytesWritable, BytesWritable, IntWritable>
 		{
 			private FastaRecord record = new FastaRecord();
 			private BytesWritable mer = new BytesWritable();
@@ -21,15 +28,13 @@ public class CountKmers {
 			private byte [] dnabuffer = null;
 			private int KMER_LEN;
 
-			public void configure(JobConf conf) 
+			public void configure(Configuration conf)
 			{
 				KMER_LEN = Integer.parseInt(conf.get("KMER_LEN"));
 				dnabuffer = new byte[DNAString.arrToDNALen(KMER_LEN)];
 			}
 
-			public void map(IntWritable id, BytesWritable rawRecord,
-					OutputCollector<BytesWritable, IntWritable> output, Reporter reporter) throws IOException 
-			{
+			public void map(IntWritable id, BytesWritable rawRecord,Context context) throws IOException, InterruptedException {
 				record.fromBytes(rawRecord);
 				
 				byte [] seq         = record.m_sequence;
@@ -55,30 +60,28 @@ public class CountKmers {
 					DNAString.arrToDNAStr(seq, start, KMER_LEN, dnabuffer, 0);
 					mer.set(dnabuffer, 0, dnabuffer.length);
 					pos.set(realoffset);
-					output.collect(mer, pos);
+					context.write(mer, pos);
 				}
 			}
 		}
 		
 		
-		public static class MerReduceClass extends MapReduceBase implements
-				Reducer<BytesWritable, IntWritable, Text, Text> 
+		public static class MerReduceClass extends Reducer<BytesWritable, IntWritable, Text, Text>
 		{
 			private static Text mertext = new Text();
 			private static Text locations = new Text();
 			private static StringBuilder builder = new StringBuilder();
 			private boolean SHOW_POS;
 			
-			public void configure(JobConf conf) 
+			public void configure(Configuration conf)
 			{
 				SHOW_POS = (Integer.parseInt(conf.get("SHOW_POS")) == 0) ? false : true;
 			}
 					
 			
 			public synchronized void reduce(BytesWritable mer, Iterator<IntWritable> values,
-					OutputCollector<Text, Text> output, Reporter reporter)
-					throws IOException 
-			{
+					Context context)
+                    throws IOException, InterruptedException {
 				int cnt = 0;
 				builder.setLength(0);
 				
@@ -106,7 +109,7 @@ public class CountKmers {
 					locations.set(Integer.toString(cnt));
 				}
 				
-				output.collect(mertext, locations);
+				context.write(mertext, locations);
 			}
 		}
 	
@@ -115,8 +118,7 @@ public class CountKmers {
 	 * @param args
 	 * @throws java.io.IOException
 	 */
-	public static void main(String[] args) throws IOException 
-	{
+	public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
 		String inpath = null;
 		String outpath = null;
 		int kmerlen = 0;
@@ -157,44 +159,61 @@ public class CountKmers {
 		System.out.println("showpos: " + showpos);
 		System.out.println("nummappers: " + numMappers);
 		System.out.println("numreducers: " + numReducers);
-		
-		JobConf conf = new JobConf(MerReduce.class);
+
+        Configuration conf = new Configuration(true);
+        Job job =new Job(conf,"CountMers");
+        job.setJarByClass(MerReduce.class);
+        //job.setNumMapTasks(numMappers);//TODO find solution for mv2
+        job.setNumReduceTasks(numReducers);
+		/*
+        JobConf conf = new JobConf(MerReduce.class);
 		conf.setNumMapTasks(numMappers);
 		conf.setNumReduceTasks(numReducers);
-
-		FileInputFormat.addInputPath(conf, new Path(inpath));
-		conf.set("KMER_LEN", Integer.toString(kmerlen));
+        */
+		FileInputFormat.addInputPath(job, new Path(inpath));
+        conf.set("KMER_LEN", Integer.toString(kmerlen));
 		conf.set("SHOW_POS", Integer.toString(showpos));
-		
-		conf.setInputFormat(SequenceFileInputFormat.class);
-			
-		conf.setMapOutputKeyClass(BytesWritable.class);
-		conf.setMapOutputValueClass(IntWritable.class);
+
+        job.setInputFormatClass(SequenceFileInputFormat.class);
+		//conf.setInputFormat(SequenceFileInputFormat.class);
+
+        job.setMapOutputKeyClass(BytesWritable.class);
+		//conf.setMapOutputKeyClass(BytesWritable.class);
+
+        job.setMapOutputValueClass(IntWritable.class);
+		//conf.setMapOutputValueClass(IntWritable.class);
 		//conf.setCompressMapOutput(true);
-				
-		conf.setOutputKeyClass(Text.class);
-		conf.setOutputValueClass(Text.class);
-		conf.setOutputFormat(TextOutputFormat.class);
-		
-		conf.setMapperClass(MerMapClass.class);
-		conf.setReducerClass(MerReduceClass.class);
+
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(Text.class);
+        job.setOutputFormatClass(TextOutputFormat.class);
+
+        //conf.setOutputKeyClass(Text.class);
+        //conf.setOutputValueClass(Text.class);
+        //conf.setOutputFormat(TextOutputFormat.class);
+
+        job.setMapperClass(MerMapClass.class);
+        job.setReducerClass(MerReduceClass.class);
+
+		//conf.setMapperClass(MerMapClass.class);
+		//conf.setReducerClass(MerReduceClass.class);
 
 		Path oPath = new Path(outpath);
-		FileOutputFormat.setOutputPath(conf, oPath);
+        FileOutputFormat.setOutputPath(job, oPath);
+		//FileOutputFormat.setOutputPath(conf, oPath);
 		System.err.println("  Removing old results");
 		FileSystem.get(conf).delete(oPath);
 				
-		conf.setJobName("CountMers");
 
 		Timer t = new Timer();
-		RunningJob rj = JobClient.runJob(conf);
+        int code = job.waitForCompletion(true) ? 0 : 1;
 		System.err.println("CountMers Finished");
 		
 		System.err.println("Total Running time was " + t.get());
 		
-		Counters counters = rj.getCounters( );
-		Counters.Group task = counters.getGroup("org.apache.hadoop.mapred.Task$Counter");		
-		long numDistinctMers = task.getCounter("REDUCE_INPUT_GROUPS");
-		System.err.println("Num Distinct Mers: " + numDistinctMers);
+		//Counters counters = rj.getCounters( );TODO check if needed to move to mv2
+		//Group task = counters.getGroup("org.apache.hadoop.mapred.Task$Counter");
+		//long numDistinctMers = task.getCounter("REDUCE_INPUT_GROUPS");
+		//System.err.println("Num Distinct Mers: " + numDistinctMers);
 	}
 }
