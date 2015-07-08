@@ -1,4 +1,3 @@
-import org.apache.avro.mapreduce.AvroSequenceFileOutputFormat;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -60,65 +59,47 @@ public class CloudBurst {
 		System.out.println("REDUNDANCY: "        + REDUNDANCY);
 		
 		Configuration conf = new Configuration(true);
+        conf.set("refpath", "/out/Sample1/Local/EU/CloudBurst/BinaryFiles/ref.br");
+        conf.set("qrypath",   "/out/Sample1/Local/EU/CloudBurst/BinaryFiles/qry.br");
+        conf.set("MIN_READ_LEN",      Integer.toString(MIN_READ_LEN));
+        conf.set("MAX_READ_LEN",      Integer.toString(MAX_READ_LEN));
+        conf.set("K",                 Integer.toString(K));
+        conf.set("SEED_LEN",          Integer.toString(SEED_LEN));
+        conf.set("FLANK_LEN",         Integer.toString(FLANK_LEN));
+        conf.set("ALLOW_DIFFERENCES", Integer.toString(ALLOW_DIFFERENCES));
+        conf.set("BLOCK_SIZE",        Integer.toString(BLOCK_SIZE));
+        conf.set("REDUNDANCY",        Integer.toString(REDUNDANCY));
+        conf.set("FILTER_ALIGNMENTS", (FILTER_ALIGNMENTS ? "1" : "0"));
 
         Job job = new Job(conf,"CloudBurst");
 		//conf.setJobName("CloudBurst"); MV1
         job.setNumReduceTasks(NUM_REDUCE_TASKS); // MV2
 
 		//conf.setNumMapTasks(NUM_MAP_TASKS); TODO find solution for mv2
-		//conf.setNumReduceTasks(NUM_REDUCE_TASKS);MV1
 
-		// old style
-		//conf.addInputPath(new Path(refpath));
-		//conf.addInputPath(new Path(qrypath));
-		
-		// new style
+		FileInputFormat.addInputPath(job, new Path("/out/Sample1/Local/EU/CloudBurst/BinaryFiles/ref.br"));//TODO change it fit to the params
+		FileInputFormat.addInputPath(job, new Path("/out/Sample1/Local/EU/CloudBurst/BinaryFiles/qry.br"));//TODO change it fit to the params
 
-		FileInputFormat.addInputPath(job, new Path(refpath));
-		FileInputFormat.addInputPath(job, new Path(qrypath));
 
-		conf.set("refpath",           refpath);
-		conf.set("qrypath",           qrypath);
-		conf.set("MIN_READ_LEN",      Integer.toString(MIN_READ_LEN));
-		conf.set("MAX_READ_LEN",      Integer.toString(MAX_READ_LEN));
-		conf.set("K",                 Integer.toString(K));
-		conf.set("SEED_LEN",          Integer.toString(SEED_LEN));
-		conf.set("FLANK_LEN",         Integer.toString(FLANK_LEN));
-		conf.set("ALLOW_DIFFERENCES", Integer.toString(ALLOW_DIFFERENCES));
-		conf.set("BLOCK_SIZE",        Integer.toString(BLOCK_SIZE));
-		conf.set("REDUNDANCY",        Integer.toString(REDUNDANCY));
-		conf.set("FILTER_ALIGNMENTS", (FILTER_ALIGNMENTS ? "1" : "0"));
+        job.setJarByClass(MerReduce.class);//mv2
 
-        job.setMapperClass(MerReduce.MapClass.class);
-		//conf.setMapperClass(MerReduce.MapClass.class);
-		
-		job.setInputFormatClass(SequenceFileInputFormat.class);
-        //conf.setInputFormat(SequenceFileInputFormat.class);
-
-        job.setMapOutputKeyClass(BytesWritable.class);//mv2
-        //conf.setMapOutputKeyClass(BytesWritable.class);mv1
-
-        job.setMapOutputValueClass(BytesWritable.class);//mv2
-		//conf.setMapOutputValueClass(BytesWritable.class);mv1
-
+        job.setInputFormatClass(SequenceFileInputFormat.class);
 		// The order of seeds is not important, but make sure the reference seeds are seen before the qry seeds
 		job.setPartitionerClass(MerReduce.PartitionMers.class); // mv2
-        //conf.setPartitionerClass(MerReduce.PartitionMers.class);
 		job.setGroupingComparatorClass(MerReduce.GroupMersWC.class); //mv2 TODO
-        //conf.setOutputValueGroupingComparator(MerReduce.GroupMersWC.class);
-		
-		job.setReducerClass(MerReduce.ReduceClass.class);
-        //conf.setReducerClass(MerReduce.ReduceClass.class);
-		//conf.setOutputKeyClass(IntWritable.class);
-        job.setOutputKeyClass(IntWritable.class);
 
-        //conf.setOutputValueClass(BytesWritable.class);
+        job.setReducerClass(MerReduce.ReduceClass.class);
+        job.setOutputKeyClass(IntWritable.class);
         job.setOutputValueClass(BytesWritable.class);
 
-        //conf.setOutputFormat(SequenceFileOutputFormat.class);
+        job.setMapperClass(MerReduce.MapClass.class);
+        job.setMapOutputKeyClass(BytesWritable.class);//mv2
+        job.setMapOutputValueClass(BytesWritable.class);//mv2
+
         job.setOutputFormatClass(SequenceFileOutputFormat.class);
-		
-		Path oPath = new Path(outpath);
+
+        System.out.println(outpath);
+        Path oPath = new Path("/out/Sample1/Local/EU/Vectors");//TODO change it fit to the params
 		//conf.setOutputPath(oPath);
 		FileOutputFormat.setOutputPath(job, oPath);
 		System.err.println("  Removing old results");
@@ -213,7 +194,7 @@ public class CloudBurst {
 
 	//------------------------- main --------------------------
 	// Parse the command line options, run alignment and filtering
-	public static void run(String[] args) throws  Exception{
+	public static int run(String[] args) throws  Exception{
         String refpath = null;
         String qrypath = null;
         String outpath = null;
@@ -280,7 +261,7 @@ public class CloudBurst {
             System.err.println("13. blocksize:        number of qry and ref tuples to consider at a time in the reduce phase. suggested: 128");
             System.err.println("14. redundancy:       number of copies of low complexity seeds to use. suggested: # processor cores");
 
-            return;
+            return 0;
         }
         else
         {
@@ -300,12 +281,12 @@ public class CloudBurst {
             redundancy       = Integer.parseInt(args[13]);
         }
 
-        if (redundancy < 1) { System.err.println("minimum redundancy is 1"); return; }
+        if (redundancy < 1) { System.err.println("minimum redundancy is 1"); return 0; }
 
         if (maxreadlen > CHUNK_OVERLAP)
         {
             System.err.println("Increase CHUNK_OVERLAP for " + maxreadlen + " length reads, and reconvert fasta file");
-            return;
+            return 0;
         }
 
         // start the timer
@@ -332,6 +313,7 @@ public class CloudBurst {
         }
 
         System.err.println("Total Running time:  " + all.get());
+        return 1;
 
     }
 

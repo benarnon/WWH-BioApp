@@ -44,7 +44,7 @@ public class PrintAlignments {
 	 * @param args
 	 * @throws java.io.IOException
 	 */
-	public static void main(String[] args) throws IOException 
+	public static int main(String[] args) throws IOException
 	{
 		String filename = null;
 		//filename = "/user/guest/br-results/";
@@ -96,5 +96,6 @@ public class PrintAlignments {
 	    {
 	    	printFile(thePath,filename);
 	    }
+        return  1;
 	}
 }

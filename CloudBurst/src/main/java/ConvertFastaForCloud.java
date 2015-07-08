@@ -88,26 +88,29 @@ public class ConvertFastaForCloud {
 		
 		int count = 0;
 		
-		try 
+		try
 		{
-			BufferedReader data = new BufferedReader(new InputStreamReader(new FileInputStream(infile)));
-			
-			String mapfile = infile;
-			mapfile += ".map";
+            System.out.println("new-  " +infile);
+            FileInputStream a = new FileInputStream(infile);
+            //System.out.println(a.read());
+            InputStreamReader b = new InputStreamReader(a);
+            //System.out.println(b.read());
+            BufferedReader data = new BufferedReader(b);
+            String mapfile = infile;
+
+            mapfile += ".map";
 			FileWriter fstream = new FileWriter(mapfile);
 		    BufferedWriter out = new BufferedWriter(fstream);
-		    
+
 			String line;
 			while ((line = data.readLine()) != null) 
 			{
 				line.trim();
-				
 				if (line.isEmpty())
 				{
 					// Guard against empty lines
 					continue;
 				}
-				
 				if (line.charAt(0) == '>')
 				{
                     int help = refQry.compareTo("R");
@@ -121,16 +124,15 @@ public class ConvertFastaForCloud {
 					sequence = new StringBuilder();
 					header = line.substring(1); // skip the >
 					count++;
-					
 					out.write(count + " " + header + "\n");
 				}
 				else
 				{
+
 					sequence.append(line.toUpperCase());
 				}
 			}
-			
-			saveSequence(count, sequence, writer);
+            saveSequence(count, sequence, writer);
 			
 		    out.close();
 		} 

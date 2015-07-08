@@ -10,6 +10,7 @@ import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
 import org.apache.hadoop.conf.Configuration;
 
@@ -48,41 +49,36 @@ public class MerReduce {
 		private MerRecord seedInfo = new MerRecord();
 		
 		
-		private int MIN_READ_LEN;
-		private int MAX_READ_LEN;
-		private int SEED_LEN;
-		private int FLANK_LEN;
-		private int K;
-		private int REDUNDANCY;
+		private int MIN_READ_LEN ;
+		private int MAX_READ_LEN ;
+		private int SEED_LEN ;
+		private int FLANK_LEN ;
+		private int K ;
+		private int REDUNDANCY ;
 		private String curfile;
 		private String refpath;
 		private byte [] seedbuffer = null;
 		
 		boolean ISREF;
 
-		//------------------------- configure --------------------------
-		// Set runtime parameters
-		
-		public void configure(Configuration conf)
-		{
-			curfile = conf.get("map.input.file");
-			refpath = conf.get("refpath");
-			ISREF = (curfile.indexOf(refpath) != -1);
-			
-			MIN_READ_LEN = Integer.parseInt(conf.get("MIN_READ_LEN"));
-			MAX_READ_LEN = Integer.parseInt(conf.get("MAX_READ_LEN"));
-			SEED_LEN     = Integer.parseInt(conf.get("SEED_LEN"));
-			FLANK_LEN    = Integer.parseInt(conf.get("FLANK_LEN"));
-			K            = Integer.parseInt(conf.get("K"));
-			REDUNDANCY   = Integer.parseInt(conf.get("REDUNDANCY"));
-			
-			seedbuffer   = new byte[DNAString.arrToSeedLen(SEED_LEN, REDUNDANCY)];
-		}
 
-		
 		//------------------------- map --------------------------
 		public void map(IntWritable id, BytesWritable rawRecord,Context context) throws IOException, InterruptedException {
-			record.fromBytes(rawRecord);
+            System.out.println("start of map");
+            curfile =  ((FileSplit) context.getInputSplit()).getPath().getName();
+            refpath = context.getConfiguration().get("refpath");
+            ISREF = (curfile.indexOf(refpath) != -1) || (refpath.indexOf(curfile)!=-1);
+
+            MIN_READ_LEN = Integer.parseInt(context.getConfiguration().get("MIN_READ_LEN"));
+            MAX_READ_LEN = Integer.parseInt(context.getConfiguration().get("MAX_READ_LEN"));
+            SEED_LEN     = Integer.parseInt(context.getConfiguration().get("SEED_LEN"));
+            FLANK_LEN    = Integer.parseInt(context.getConfiguration().get("FLANK_LEN"));
+            K            = Integer.parseInt(context.getConfiguration().get("K"));
+            REDUNDANCY   = Integer.parseInt(context.getConfiguration().get("REDUNDANCY"));
+
+            seedbuffer   = new byte[DNAString.arrToSeedLen(SEED_LEN, REDUNDANCY)];
+
+            record.fromBytes(rawRecord);
 
 
             byte [] seq         = record.m_sequence;
@@ -219,7 +215,8 @@ public class MerReduce {
 					}
 				}
 			}
-		}
+            System.out.println("end of map");
+        }
 	}
 	
 	
@@ -243,6 +240,7 @@ public class MerReduce {
 		
 		public int getPartition(BytesWritable key, BytesWritable value, int numPartitions)
 		{
+
 			// hash over everything except the last byte (ref/qry flag)
 			int part = (WritableComparator.hashBytes(key.get(), key.getSize()-1) & Integer.MAX_VALUE) % numPartitions;
 			
@@ -250,39 +248,12 @@ public class MerReduce {
 			//System.out.println("partition: " + DNAString.bytesToString(seedstr) + " " + part);
 			//DNAString.printHex("raw", key.get(), 0, key.getSize());
 			
-			return part;
+			return 1;
 		}	
 	}	
 	
 	
-		
-	
 
-//		// -- Use a customer comparator so reference seeds are grouped with qry seeds with the same mer
-//		public static class GroupMers implements RawComparator<BytesWritable>
-//		{		
-//			public int compare(byte[] b1, int s1, int l1, byte[] b2, int s2, int l2) 
-//			{
-//				//System.err.println("bcomparing: " + b1.toString() + " and " + b2.toString());
-//				
-//				int len = l1-1;
-//				
-//				for (int i = 0; i < len; i++)
-//				{
-//					int diff = b1[i] - b2[i];
-//					if (diff != 0) { return diff; }
-//				}
-//				
-//				return 0;
-//			}
-//			
-//			public int compare(BytesWritable o1, BytesWritable o2) 
-//			{
-//				return compare(o1.get(), o1.getCapacity(), o1.getSize(), o2.get(), o2.getCapacity(), o2.getSize());
-//			}
-//		}
-
-		
 	public static class GroupMersWC extends WritableComparator
 	{
 	    public GroupMersWC()
@@ -352,38 +323,13 @@ public class MerReduce {
 		//------------------------- configure --------------------------	
 		// Get the runtime parameters
 		
-		public void configure(Configuration conf)
-		{				
-			K                 = Integer.parseInt(conf.get("K"));
-			SEED_LEN          = Integer.parseInt(conf.get("SEED_LEN"));
-			ALLOW_DIFFERENCES = Integer.parseInt(conf.get("ALLOW_DIFFERENCES")) == 1;
-			BLOCK_SIZE        = Integer.parseInt(conf.get("BLOCK_SIZE"));
-			REDUNDANCY        = Integer.parseInt(conf.get("REDUNDANCY"));
-			FILTER_ALIGNMENTS = Integer.parseInt(conf.get("FILTER_ALIGNMENTS")) == 1;
-			
-			if (FILTER_ALIGNMENTS)
-			{
-				bestalignments   = new AlignmentRecord[BLOCK_SIZE];
-				secondalignments = new AlignmentRecord[BLOCK_SIZE];
-				recordsecond     = new boolean[BLOCK_SIZE];
-				bestk            = new int[BLOCK_SIZE];
-				
-				for (int i = 0; i < BLOCK_SIZE; i++)
-				{
-					bestalignments[i]   = new AlignmentRecord();
-					secondalignments[i] = new AlignmentRecord();
-				}
-			}
-			
-			LandauVishkin.configure(K);
-		}
-				
-		
+
 		//------------------------- extend --------------------------
 		// Given an exact shared seed, try to extend to a full length alignment
 		
 		public static AlignmentRecord extend(MerRecord qrytuple, MerRecord reftuple,Context context) throws IOException
 		{
+
 			int refStart    = reftuple.offset;
 			int refEnd      = reftuple.offset + SEED_LEN;
 			int differences = 0;
@@ -438,6 +384,30 @@ public class MerReduce {
 		//------------------------- reduce --------------------------
 		public synchronized void reduce(BytesWritable mer, Iterator<BytesWritable> values,Context context)
                 throws IOException, InterruptedException {
+            System.out.println("Start of reducer");
+            K                 = Integer.parseInt(context.getConfiguration().get("K"));
+            SEED_LEN          = Integer.parseInt(context.getConfiguration().get("SEED_LEN"));
+            ALLOW_DIFFERENCES = Integer.parseInt(context.getConfiguration().get("ALLOW_DIFFERENCES")) == 1;
+            BLOCK_SIZE        = Integer.parseInt(context.getConfiguration().get("BLOCK_SIZE"));
+            REDUNDANCY        = Integer.parseInt(context.getConfiguration().get("REDUNDANCY"));
+            FILTER_ALIGNMENTS = Integer.parseInt(context.getConfiguration().get("FILTER_ALIGNMENTS")) == 1;
+
+            if (FILTER_ALIGNMENTS)
+            {
+                bestalignments   = new AlignmentRecord[BLOCK_SIZE];
+                secondalignments = new AlignmentRecord[BLOCK_SIZE];
+                recordsecond     = new boolean[BLOCK_SIZE];
+                bestk            = new int[BLOCK_SIZE];
+
+                for (int i = 0; i < BLOCK_SIZE; i++)
+                {
+                    bestalignments[i]   = new AlignmentRecord();
+                    secondalignments[i] = new AlignmentRecord();
+                }
+            }
+
+            LandauVishkin.configure(K);
+
 			Timer timer = new Timer();
 			
 			reftuples.clear();
@@ -514,7 +484,8 @@ public class MerReduce {
 				//reporter.setStatus(seedstr + " : " + totalr + " x " + totalq + " = " + totalr*totalq + " " + timer.get());TODO reporter need to be changed to mv2
 				System.err.println(seedstr + " : " + totalr + " x " + totalq + " = " + totalr*totalq + " " + timer.get());
 			}
-		}
+            System.out.println("end of reducer");
+        }
 		
 		public static void alignBatch(Context context) throws IOException, InterruptedException {
 			int numr = reftuples.size();
@@ -571,7 +542,7 @@ public class MerReduce {
 								else
 								{
 									qryid.set(qry.id);
-									context.write(qryid, fullalignment.toBytes());
+									//context.write(qryid, fullalignment.toBytes());
 								}
 							}
 						}
@@ -584,11 +555,11 @@ public class MerReduce {
 							if (bestk[qidx] <= K)
 							{
 								qryid.set(qrytuples.get(qidx+startq).id);
-								context.write(qryid, bestalignments[qidx].toBytes());
+								//context.write(qryid, bestalignments[qidx].toBytes());
 								
 								if (recordsecond[qidx])
 								{
-									context.write(qryid, secondalignments[qidx].toBytes());
+									//context.write(qryid, secondalignments[qidx].toBytes());
 								}
 							}
 						}
