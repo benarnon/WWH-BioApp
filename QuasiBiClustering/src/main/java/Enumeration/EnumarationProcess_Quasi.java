@@ -7,7 +7,6 @@ import BasicComponent.Sample;
 import FeatureRelatedComponent.Member;
 import FeatureRelatedComponent.feature;
 import Mains.EnumParams;
-import com.sun.org.apache.xalan.internal.utils.FeatureManager;
 
 import java.util.ArrayList;
 import java.util.Stack;

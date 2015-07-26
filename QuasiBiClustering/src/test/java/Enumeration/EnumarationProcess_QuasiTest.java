@@ -15,9 +15,9 @@ public class EnumarationProcess_QuasiTest extends TestCase {
     }
 
     public void testNested_appendBrothers() throws Exception {
-
+/*
         String[] symptoms = {"fever" , "headache"};
-        Sample sample = new Sample("testSample1" , new Date(System.currentTimeMillis()) , "Rambam" , symptoms);
+        Sample sample = new Sample("testSample1" , new Date(System.currentTimeMillis()) , "Rambam" );
         EnumarationProcess_Quasi ep = new EnumarationProcess_Quasi();
 
 //        System.out.println("cluster children amount start time = " + ep._treeRoot._children.size());
@@ -55,7 +55,7 @@ public class EnumarationProcess_QuasiTest extends TestCase {
         System.out.println("cluster children amount start time = " + ep._treeRoot._children.size());
         System.out.println(ep.nested_appendBrothers(sample));
         System.out.println("cluster children amount finish time = " + ep._treeRoot._children.size());
-
+*/
     }
 
     public void testNested_deletePath() throws Exception {
