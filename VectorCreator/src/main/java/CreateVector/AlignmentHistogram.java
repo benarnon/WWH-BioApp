@@ -75,6 +75,7 @@ public class AlignmentHistogram {
         sb.append("\t" + computeCoverage(1));
         sb.append("\t" + integral);
         sb.append("\t" + numOfReads);
+        sb.append("\t$");
 
         return sb.toString();
     }
@@ -82,23 +83,35 @@ public class AlignmentHistogram {
     public String toString(int start, int end,int jump) {
         StringBuilder sb = new StringBuilder(jump*4 + 256);
         sb.append(start);
-        sb.append(" ");
+        sb.append("\t");
         sb.append(end);
-        sb.append(" ");
-        sb.append("+ ");
-        for (int i = start; i < end; i++) {
-            sb.append(histogram[i]);
-            sb.append(" ");
+        sb.append("\t");
+        sb.append("+");
+        sb.append("\t");
+        int begin = start;
+        double value = histogram[start];
+        for (int i = start+1; i < end; i++) {
+            if(histogram[i] != value | i == end-1){
+                sb.append("|" + begin +"," + ((i-1)-begin) + "," + value + "|");
+                value = histogram[i];
+                begin = i;
+            }
         }
-        sb.append("- ");
-        for (int i = start; i < end; i++) {
-            sb.append(reverseHistogram[i]);
-            sb.append(" ");
+        sb.append("-\t");
+        begin = start;
+        value = histogram[start];
+        for (int i = start+1; i < end; i++) {
+            if(histogram[i] != value | i == end-1){
+                sb.append("|" + begin +"," + ((i-1)-begin + 1) + "," + value + "|");
+                value = histogram[i];
+                begin = i;
+            }
         }
         sb.append("\t" + computeDepth());
         sb.append("\t" + computeCoverage(1));
         sb.append("\t" + integral);
         sb.append("\t" + numOfReads);
+        sb.append("\t$");
 
         return sb.toString();
     }

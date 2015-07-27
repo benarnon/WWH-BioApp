@@ -1,5 +1,8 @@
-package CloudBurst;
+package ConvertFile;
 
+import CloudBurst.DNAString;
+import CloudBurst.FastaRecord;
+import CloudBurst.cloudBurst;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;

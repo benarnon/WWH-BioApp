@@ -13,7 +13,7 @@ import java.util.List;
  * VecorUnit class will be replaced by the global reudcer.
  * His task is to aggregate all the local vectors to one vector and upload it to the origin cluster
  */
-public class FinalVectorCreator {
+public class GlobalReducer {
     public static class ClusterReducer extends Reducer<Text, Text, Text, Text> {
         @Override
         protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {

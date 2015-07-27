@@ -107,89 +107,10 @@ public class cloudBurst {
 		System.err.println("Finished");
 	}
 	
-	
-	//------------------------- filter --------------------------
-	// Setup and run the hadoop job for filtering the alignments to just report unambiguous bests
-
-	public static void filter(String alignpath, 
-			                  String outpath,
-                              int nummappers,
-                              int numreducers) throws IOException, Exception
-    {
-		System.out.println("NUM_FMAP_TASKS: "     + nummappers);
-		System.out.println("NUM_FREDUCE_TASKS: "  + numreducers);
-
-        // Create configuration
-        Configuration conf = new Configuration(true);//mv2
-
-        // Create job
-        Job job = new Job(conf, "WordCount");//mv2
-        job.setJarByClass(FilterAlignments.class);//mv2
-
-
-        //JobConf conf = new JobConf(FilterAlignments.class);//mv1
-		//conf.setJobName("FilterAlignments");//mv1
-
-        job.setNumReduceTasks(numreducers);//mv2
-		//conf.setNumMapTasks(nummappers);//TODO find solution for mv2
-		//conf.setNumReduceTasks(numreducers);//mv1
-		
-		// old style
-		//conf.addInputPath(new Path(alignpath));
-		FileInputFormat.addInputPath(job, new Path(alignpath));
-
-        job.setMapperClass(FilterAlignments.FilterMapClass.class);//mv2
-        //conf.setMapperClass(FilterAlignments.FilterMapClass.class);//mv1
-
-        job.setInputFormatClass(SequenceFileInputFormat.class);//mv2
-        //conf.setInputFormat(SequenceFileInputFormat.class);mv1
-
-        job.setMapOutputKeyClass(IntWritable.class);//mv2
-        //conf.setMapOutputKeyClass(IntWritable.class);mv1
-
-        job.setMapOutputValueClass(BytesWritable.class);//mv2
-        //conf.setMapOutputValueClass(BytesWritable.class);mv1
-
-        job.setInputFormatClass(SequenceFileInputFormat.class);//mv2
-        //conf.setInputFormat(SequenceFileInputFormat.class);mv1
-
-        job.setMapOutputKeyClass(IntWritable.class);
-        //conf.setMapOutputKeyClass(IntWritable.class);
-
-        job.setMapOutputValueClass(BytesWritable.class);
-        //conf.setMapOutputValueClass(BytesWritable.class);
-
-        job.setCombinerClass(FilterAlignments.FilterCombinerClass.class);
-        //conf.setCombinerClass(FilterAlignments.FilterCombinerClass.class);
-
-        job.setReducerClass(FilterAlignments.FilterReduceClass.class);
-        //conf.setReducerClass(FilterAlignments.FilterReduceClass.class);
-
-        job.setOutputKeyClass(IntWritable.class);
-        //conf.setOutputKeyClass(IntWritable.class);
-
-        job.setOutputValueClass(BytesWritable.class);
-        //conf.setOutputValueClass(BytesWritable.class);
-
-        job.setOutputFormatClass(SequenceFileOutputFormat.class);
-        //conf.setOutputFormat(SequenceFileOutputFormat.class);
-
-		Path oPath = new Path(outpath);
-		FileOutputFormat.setOutputPath(job, oPath);
-		//conf.setOutputPath(oPath);
-		System.err.println("  Removing old results");
-		FileSystem.get(conf).delete(oPath);
-
-        //JobClient rj = JobClient.runJob(conf);
-        int code = job.waitForCompletion(true) ? 0 : 1;
-
-		System.err.println("FilterAlignments Finished");
-    }
-
 
 	//------------------------- main --------------------------
 	// Parse the command line options, run alignment and filtering
-	public static int run(String[] args) throws  Exception{
+	public static void run(String[] args) throws  Exception{
         System.out.println("The args length: " + args.length);
         String refpath = null;
         String qrypath = null;
@@ -231,7 +152,7 @@ public class cloudBurst {
             System.err.println("13. blocksize:        number of qry and ref tuples to consider at a time in the reduce phase. suggested: 128");
             System.err.println("14. redundancy:       number of copies of low complexity seeds to use. suggested: # processor cores");
 
-            return 0;
+            return;
         }
         else
         {
@@ -252,38 +173,24 @@ public class cloudBurst {
             FastaList        = args[14];
         }
 
-        if (redundancy < 1) { System.err.println("minimum redundancy is 1"); return 0; }
+        if (redundancy < 1) { System.err.println("minimum redundancy is 1"); return; }
 
         if (maxreadlen > CHUNK_OVERLAP)
         {
             System.err.println("Increase CHUNK_OVERLAP for " + maxreadlen + " length reads, and reconvert fasta file");
-            return 0;
+            return;
         }
 
         // start the timer
         Timer all = new Timer();
 
         String alignpath = outpath;
-        if (filteralignments) { alignpath += "-alignments"; }
         // run the alignments
         Timer talign = new Timer();
         alignall(refpath, qrypath, alignpath, minreadlen, maxreadlen, K, allowdifferences, filteralignments,
                 nummappers, numreducers, blocksize, redundancy,FastaList);
         System.err.println("Alignment time: " + talign.get());
-
-
-        // filter to report best alignments
-
-        if (filteralignments)
-        {
-            Timer tfilter = new Timer();
-            //filter(alignpath, outpath, numfmappers, numfreducers);
-
-            System.err.println("Filtering time: " + tfilter.get());
-        }
-
         System.err.println("Total Running time:  " + all.get());
-        return 1;
 
     }
 

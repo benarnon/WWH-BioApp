@@ -13,7 +13,7 @@ public class FastaRecord
 	
 	private static final StringBuilder builder = new StringBuilder();
 	
-	FastaRecord()
+	public FastaRecord()
 	{
 
 	}
