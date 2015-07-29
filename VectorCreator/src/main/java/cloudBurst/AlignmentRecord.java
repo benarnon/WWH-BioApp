@@ -1,4 +1,4 @@
-package CloudBurst;
+package cloudBurst;
 
 import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.Text;

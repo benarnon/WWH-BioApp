@@ -1,4 +1,4 @@
-package CloudBurst;
+package cloudBurst;
 
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;

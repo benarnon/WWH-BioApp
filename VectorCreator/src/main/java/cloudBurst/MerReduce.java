@@ -1,4 +1,4 @@
-package CloudBurst;
+package cloudBurst;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.*;
@@ -91,7 +91,7 @@ public class MerReduce {
 				// If I'm not the first chunk, shift over so there is room for the left flank
 				if (realoffsetstart != 0)
 				{
-					startoffset = cloudBurst.CHUNK_OVERLAP + 1 - FLANK_LEN - SEED_LEN;
+					startoffset = CloudBurst.CHUNK_OVERLAP + 1 - FLANK_LEN - SEED_LEN;
 					realoffsetstart += startoffset;
 				}
 

@@ -1,7 +1,8 @@
 package main;
 
-import CloudBurst.cloudBurst;
-import CreateVector.VectorMapred;
+import cloudBurst.CloudBurst;
+import createHistograms.HistogramParser;
+import createVector.VectorMapred;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -34,8 +35,9 @@ public class mainCreateVector {
     public static void RunVectorCreator() throws Exception {
         configue();
         String PathogenLength = toStringGeneLength();
-        cloudBurst.run(params);
+        CloudBurst.run(params);
         VectorMapred.CreateVector(OutPath + "/" + SampleName +"/Local/Bed-File/" , OutPath + "/" + SampleName +"/Local/finalVecor/", 1 ,1,PathogenLength);
+        HistogramParser.parse(OutPath + "/" + SampleName + "/" + "/Local/finalVecor/part-r-00000","/home/user/IdeaProjects/WWH-BioApp_resources/resources/Sanity_Resources/outputs");
 
     }
 
@@ -109,7 +111,6 @@ public class mainCreateVector {
             System.out.println("SampleName SampleFilePath HealthySamplePath PathogenDbPath PathogenDbIndexFilePath OutputPath MaxReadLength MinReadLength K AllowDiff ShowResults NumOfMappers NumOfReducers BlockSize Redundancy");
             return;
         }
-
         SampleName =args[0];
         qpath = args[1];
         healthyPath = args[2];

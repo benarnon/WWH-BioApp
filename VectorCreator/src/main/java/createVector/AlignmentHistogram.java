@@ -1,4 +1,4 @@
-package CreateVector;
+package createVector;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -92,18 +92,18 @@ public class AlignmentHistogram {
         double value = histogram[start];
         for (int i = start+1; i < end; i++) {
             if(histogram[i] != value | i == end-1){
-                sb.append("|" + begin +"," + ((i-1)-begin) + "," + value + "|");
+                sb.append("|" + begin +"," + ((i)-begin) + "," + value + "|");
                 value = histogram[i];
                 begin = i;
             }
         }
         sb.append("-\t");
         begin = start;
-        value = histogram[start];
+        value = reverseHistogram[start];
         for (int i = start+1; i < end; i++) {
-            if(histogram[i] != value | i == end-1){
-                sb.append("|" + begin +"," + ((i-1)-begin + 1) + "," + value + "|");
-                value = histogram[i];
+            if(reverseHistogram[i] != value | i == end-1){
+                sb.append("|" + begin +"," + ((i)-begin) + "," + value + "|");
+                value = reverseHistogram[i];
                 begin = i;
             }
         }

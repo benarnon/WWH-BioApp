@@ -1,12 +1,9 @@
-package CreateVector;
+package createVector;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.hadoop.io.LongWritable;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by user on 3/2/15.

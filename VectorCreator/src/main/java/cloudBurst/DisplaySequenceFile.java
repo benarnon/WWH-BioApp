@@ -1,4 +1,4 @@
-package CloudBurst;//Written by Alexander Mont <alexmont1@comcast.net>
+package cloudBurst;//Written by Alexander Mont <alexmont1@comcast.net>
 
 //Reads a SequenceFile and outputs the key-value pairs. Intended
 //primarily for testing and debugging purposes.

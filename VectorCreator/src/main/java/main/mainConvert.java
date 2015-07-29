@@ -1,6 +1,6 @@
 package main;
 
-import ConvertFile.ConvertFastaForCloud;
+import convertFile.ConvertFastaForCloud;
 
 import java.io.IOException;
 

@@ -1,6 +1,5 @@
-package CreateVector;
+package createVector;
 
-import org.apache.hadoop.fs.*;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -8,14 +7,13 @@ import org.apache.hadoop.mapreduce.*;
 import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.*;
-import java.net.URI;
-import java.nio.file.*;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class VectorCreator {
+public class
+        VectorCreator {
     //Collecting all the contigs to one pathogen
     public static void CreateFinalVector(String vectorPath, List<String> DBlist, List<String> DBlength, String SampleName, String finalPath, int db) {
         //PathSum contain for each pathogen in the vector file the sum of all his contigs
@@ -192,12 +190,16 @@ public class VectorCreator {
             int location = 0;
             while(location < hist.getLength()){
                 if(hist.getLength()-location < jump){
-                    context.write(key,new Text(hist.toString(location,hist.getLength(),jump)));
+                    String tmp = context.getConfiguration().get("ClusterName")+"-" + key.toString();
+                    Text newKey = new Text(tmp);
+                    context.write(newKey,new Text(hist.toString(location,hist.getLength(),jump)));
                     location+=jump;
                 }
 
                 else{
-                    context.write(key,new Text(hist.toString(location,location+jump,jump)));
+                    String tmp = context.getConfiguration().get("ClusterName")+"-" + key.toString();
+                    Text newKey = new Text(tmp);
+                    context.write(newKey,new Text(hist.toString(location,location+jump-1,jump)));
                     location+=jump;
                 }
 

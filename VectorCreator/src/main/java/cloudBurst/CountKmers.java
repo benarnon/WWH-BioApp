@@ -1,4 +1,4 @@
-package CloudBurst;
+package cloudBurst;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -48,7 +48,7 @@ public class CountKmers {
 				// If I'm not the first chunk, shift over so there is room for the left flank
 				if (realoffsetstart != 0)
 				{
-					int shift = cloudBurst.CHUNK_OVERLAP + 1 - KMER_LEN;
+					int shift = CloudBurst.CHUNK_OVERLAP + 1 - KMER_LEN;
 					startoffset = shift;
 					realoffsetstart += shift;
 				}

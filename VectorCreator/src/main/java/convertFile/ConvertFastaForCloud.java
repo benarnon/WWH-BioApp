@@ -1,8 +1,8 @@
-package ConvertFile;
+package convertFile;
 
-import CloudBurst.DNAString;
-import CloudBurst.FastaRecord;
-import CloudBurst.cloudBurst;
+import cloudBurst.DNAString;
+import cloudBurst.FastaRecord;
+import cloudBurst.CloudBurst;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -76,7 +76,7 @@ public class ConvertFastaForCloud {
 			}
 			else
 			{
-				offset = end - cloudBurst.CHUNK_OVERLAP;
+				offset = end - CloudBurst.CHUNK_OVERLAP;
 			}
 		}
 		

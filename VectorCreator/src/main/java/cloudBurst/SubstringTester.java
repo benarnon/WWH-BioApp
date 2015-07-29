@@ -1,4 +1,4 @@
-package CloudBurst;
+package cloudBurst;
 
 import org.apache.hadoop.io.Text;
 //TODO migrate to yarn

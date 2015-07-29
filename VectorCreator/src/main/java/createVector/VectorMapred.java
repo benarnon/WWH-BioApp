@@ -1,4 +1,4 @@
-package CreateVector;
+package createVector;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -7,10 +7,8 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.mapreduce.filecache.DistributedCache;
 
 import java.io.IOException;
-import java.net.URI;
 
 
 /**
@@ -19,18 +17,23 @@ import java.net.URI;
 
 
 public class VectorMapred {
+
     public static void CreateVector(String CBresults,
                                     String outpath,
                                     int nummappers,
                                     int numreducers,
                                     String GeneLengthLookup) throws IOException, Exception
+
     {
+        String clusterID = "C5";
         System.out.println("NUM_FMAP_TASKS: "     + nummappers);
         System.out.println("NUM_FREDUCE_TASKS: "  + numreducers);
 
         Configuration conf = new Configuration(true);
         conf.set("GeneLengthLookup",GeneLengthLookup);
-        Job job = new Job(conf, "CreateVector");
+        conf.set("ClusterName",clusterID);
+
+        Job job = new Job(conf, "createVector");
         //DistributedCache.addCacheFile(new URI("/Dist/gene_length_lookup.txt"),job.getConfiguration());
 
         job.setNumReduceTasks(numreducers); // MV2

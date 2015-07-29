@@ -1,4 +1,4 @@
-package CloudBurst;
+package cloudBurst;
 
 public class Timer {
 	

@@ -1,22 +1,20 @@
-package CloudBurst;
+package cloudBurst;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
 import javax.xml.soap.Text;
 import java.io.IOException;
 
 //TODO migrate to yarn -DONE
-public class cloudBurst {
+public class CloudBurst {
 	
 	// Make sure this number is longer than the longest read
 	public static final int CHUNK_OVERLAP = 1024;
@@ -43,7 +41,7 @@ public class cloudBurst {
 
         int SEED_LEN   = MIN_READ_LEN / (K+1);
 		int FLANK_LEN  = MAX_READ_LEN-SEED_LEN+K;
-
+        String clusterID = "C1";
 		System.out.println("refath: "            + refpath);
 		System.out.println("qrypath: "           + qrypath);
 		System.out.println("outpath: "           + outpath);
@@ -73,7 +71,7 @@ public class cloudBurst {
         conf.set("FILTER_ALIGNMENTS", (FILTER_ALIGNMENTS ? "1" : "0"));
         conf.set("FastaList",FastaList);
 
-        Job job = new Job(conf,"CloudBurst");
+        Job job = new Job(conf, "cloudBurst");
         job.setNumReduceTasks(NUM_REDUCE_TASKS); // MV2
 
 		//conf.setNumMapTasks(NUM_MAP_TASKS); TODO find solution for mv2
