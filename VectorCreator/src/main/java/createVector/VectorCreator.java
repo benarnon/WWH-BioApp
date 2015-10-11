@@ -132,32 +132,17 @@ public class
         private AlignmentHistogram hist , reverseCompHist;
         private int geneUnitLength , numOfReads;
         private double depth , coverage;
+        private String sampleName;
 
 
         @Override
         protected void setup(Context context) throws IOException, InterruptedException {
-            /*
-            org.apache.hadoop.fs.Path[] cacheFiles = context.getLocalCacheFiles();
-            BufferedReader br = new BufferedReader(new FileReader(cacheFiles[0].toString()));
-            try {
-                StringBuilder sb = new StringBuilder();
-                String line = br.readLine();
-
-                while (line != null) {
-                    gene_size_lookup.put(line.split("\t")[0], Integer.parseInt(line.split("\t")[1]));
-                    line = br.readLine();
-                }
-            } finally {
-                br.close();
-            }
-            */
-
-
             String geneLength  = context.getConfiguration().get("GeneLengthLookup");
             String[] split = geneLength.split("\n");
             for (int i = 0; i < split.length; i++) {
                 gene_size_lookup.put(split[i].split("\t")[0] , Integer.parseInt(split[i].split("\t")[1]));
             }
+            sampleName = context.getConfiguration().get("SampleName");
 
         }
 
@@ -165,8 +150,8 @@ public class
         protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
 
             String[] alignmentData;
-            //System.out.println("THIS IS THE KEY!!!:" + key.toString());
-            geneUnitLength = gene_size_lookup.get(key.toString().split(" ")[0]);
+            System.out.println("THIS IS THE KEY!!!:" + key.toString());
+            geneUnitLength = gene_size_lookup.get(key.toString());
             hist = new AlignmentHistogram(geneUnitLength);
             //Size of histogram segments
             int jump = 100000;
@@ -190,14 +175,14 @@ public class
             int location = 0;
             while(location < hist.getLength()){
                 if(hist.getLength()-location < jump){
-                    String tmp = context.getConfiguration().get("ClusterName")+"-" + key.toString();
+                    String tmp = sampleName + "#" + context.getConfiguration().get("ClusterName")+"#" + key.toString();
                     Text newKey = new Text(tmp);
                     context.write(newKey,new Text(hist.toString(location,hist.getLength(),jump)));
                     location+=jump;
                 }
 
                 else{
-                    String tmp = context.getConfiguration().get("ClusterName")+"-" + key.toString();
+                    String tmp = sampleName + "-" + context.getConfiguration().get("ClusterName")+"-" + key.toString();
                     Text newKey = new Text(tmp);
                     context.write(newKey,new Text(hist.toString(location,location+jump-1,jump)));
                     location+=jump;

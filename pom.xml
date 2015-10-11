@@ -10,9 +10,8 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>VectorCreator</module>
-        <module>Analyst</module>
         <module>QuasiBiClustering</module>
-
+        <module>MatrxiCreator</module>
 
     </modules>
 
@@ -28,24 +27,6 @@
                         <target>1.7</target>
                     </configuration>
                 </plugin>
-                <plugin>
-                    <groupId>org.apache.avro</groupId>
-                    <artifactId>avro-maven-plugin</artifactId>
-                    <version>1.7.6</version>
-                    <executions>
-                        <execution>
-                            <phase>generate-sources</phase>
-                            <goals>
-                                <goal>schema</goal>
-                            </goals>
-                            <configuration>
-                                <sourceDirectory>${project.basedir}/src/main/avro/</sourceDirectory>
-                                <outputDirectory>${project.basedir}/src/main/java/</outputDirectory>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-
             </plugins>
         </pluginManagement>
     </build>
@@ -78,6 +59,11 @@
                 <groupId>junit</groupId>
                 <artifactId>junit-dep</artifactId>
                 <version>4.8.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jfree</groupId>
+                <artifactId>jfreechart</artifactId>
+                <version>1.0.19</version>
             </dependency>
         </dependencies>
 

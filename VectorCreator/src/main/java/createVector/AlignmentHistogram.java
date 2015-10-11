@@ -87,6 +87,10 @@ public class AlignmentHistogram {
         sb.append(end);
         sb.append("\t");
         sb.append("+");
+        sb.append("\t" + computeDepth());
+        sb.append("\t" + computeCoverage(1));
+        sb.append("\t" + integral);
+        sb.append("\t" + numOfReads);
         sb.append("\t");
         int begin = start;
         double value = histogram[start];
@@ -107,10 +111,6 @@ public class AlignmentHistogram {
                 begin = i;
             }
         }
-        sb.append("\t" + computeDepth());
-        sb.append("\t" + computeCoverage(1));
-        sb.append("\t" + integral);
-        sb.append("\t" + numOfReads);
         sb.append("\t$");
 
         return sb.toString();

@@ -58,8 +58,8 @@ public class CloudBurst {
 		System.out.println("REDUNDANCY: "        + REDUNDANCY);
 
 		Configuration conf = new Configuration(true);
-        conf.set("refpath", "/out/Sample1/Local/EU/CloudBurst/BinaryFiles/ref.br");
-        conf.set("qrypath",   "/out/Sample1/Local/EU/CloudBurst/BinaryFiles/qry.br");
+        conf.set("refpath", "ref.br");
+        conf.set("qrypath",   "qry.br");
         conf.set("MIN_READ_LEN",      Integer.toString(MIN_READ_LEN));
         conf.set("MAX_READ_LEN",      Integer.toString(MAX_READ_LEN));
         conf.set("K",                 Integer.toString(K));

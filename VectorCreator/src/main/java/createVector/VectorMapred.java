@@ -22,16 +22,18 @@ public class VectorMapred {
                                     String outpath,
                                     int nummappers,
                                     int numreducers,
-                                    String GeneLengthLookup) throws IOException, Exception
+                                    String GeneLengthLookup,
+                                    String clusterID,
+                                    String sampleName) throws IOException, Exception
 
     {
-        String clusterID = "C5";
         System.out.println("NUM_FMAP_TASKS: "     + nummappers);
         System.out.println("NUM_FREDUCE_TASKS: "  + numreducers);
 
         Configuration conf = new Configuration(true);
         conf.set("GeneLengthLookup",GeneLengthLookup);
         conf.set("ClusterName",clusterID);
+        conf.set("SampleName",sampleName);
 
         Job job = new Job(conf, "createVector");
         //DistributedCache.addCacheFile(new URI("/Dist/gene_length_lookup.txt"),job.getConfiguration());
@@ -45,7 +47,6 @@ public class VectorMapred {
         //conf.setInputFormat(SequenceFileInputFormat.class);
         job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(Text.class);
-
 
         job.setReducerClass(VectorCreator.ClusterReducer.class);
         job.setOutputKeyClass(Text.class);
@@ -66,11 +67,4 @@ public class VectorMapred {
         System.err.println("Create Vector Finished");
     }
 
-    public static void main(String[] args) throws Exception {
-        try {
-            CreateVector(args[0] , args[1] , Integer.valueOf(args[2]) , Integer.valueOf(args[3]),args[4]);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }

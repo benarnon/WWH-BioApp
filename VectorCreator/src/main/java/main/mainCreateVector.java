@@ -1,7 +1,8 @@
 package main;
 
 import cloudBurst.CloudBurst;
-import createHistograms.HistogramParser;
+import report.CreateReport;
+import report.HistogramParser;
 import createVector.VectorMapred;
 
 import java.io.BufferedReader;
@@ -29,6 +30,9 @@ public class mainCreateVector {
     static String blocksize;
     static String redundancy;
     //General
+    public static final String CSV_FILES_PATH = "/home/user/IdeaProjects/WWH-BioApp_resources/";
+    public static final String CLUSTER_ID ="C1";
+
     public static String[] params = new String[15];
 
 
@@ -36,16 +40,15 @@ public class mainCreateVector {
         configue();
         String PathogenLength = toStringGeneLength();
         CloudBurst.run(params);
-        VectorMapred.CreateVector(OutPath + "/" + SampleName +"/Local/Bed-File/" , OutPath + "/" + SampleName +"/Local/finalVecor/", 1 ,1,PathogenLength);
-        HistogramParser.parse(OutPath + "/" + SampleName + "/" + "/Local/finalVecor/part-r-00000","/home/user/IdeaProjects/WWH-BioApp_resources/resources/Sanity_Resources/outputs");
-
+        VectorMapred.CreateVector(OutPath + "/" + SampleName +"/Local/Bed-File/" , OutPath + "/" + SampleName +"/Local/finalVecor/", 1 ,1,PathogenLength,CLUSTER_ID,SampleName);
+        HistogramParser.parse(OutPath + "/" + SampleName + "/" + "/Local/finalVecor/part-r-00000",CSV_FILES_PATH);
+        String[] par = {};
     }
 
     private static void configue() throws IOException {
         params[0] = rpath;
         params[1] = qpath;
         params[2] = OutPath +"/"+ SampleName +"/Local/Bed-File/";
-
         params[3] = minlength;
         params[4] = maxlength;
         params[5] = CBk;

@@ -134,7 +134,7 @@ public class ConvertFastaForCloud {
 				}
 				else
 				{
-
+					System.out.println(line);
 					sequence.append(line.toUpperCase());
 				}
 			}

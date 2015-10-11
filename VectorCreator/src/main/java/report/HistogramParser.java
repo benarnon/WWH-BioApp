@@ -1,4 +1,4 @@
-package createHistograms;
+package report;
 
 import java.io.*;
 

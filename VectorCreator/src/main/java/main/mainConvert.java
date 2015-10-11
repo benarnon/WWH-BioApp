@@ -13,7 +13,7 @@ public class mainConvert {
         //qpath rpath outPath SampleName
         String[] params2 = new String[3];
         params2[0] = args[0];
-        params2[1] = args[2] +"/qry.br";
+        params2[1] = args[2] + "/qry.br";
         params2[2] = "Q";
         try {
             ConvertFastaForCloud.main(params2);
@@ -29,8 +29,9 @@ public class mainConvert {
             System.out.println("ConvertFastaForCloud.FastaList: " + ConvertFastaForCloud.FastaList.length);
         } catch (IOException e) {
             e.printStackTrace();
+
+
         }
+
     }
-
-
 }
