@@ -23,7 +23,7 @@ public class matrixMapred {
         Configuration conf = new Configuration(true);
 
         Job job = new Job(conf, "matrixCreator");
-        FileInputFormat.addInputPath(job, new Path("/matrixIn"));
+        FileInputFormat.addInputPath(job, new Path("/out/Sample100/Local/finalVecor/part-r-00000"));
         job.setJarByClass(matrixCreator.class);
         job.setMapperClass(matrixCreator.ClusterMapper.class);
 
