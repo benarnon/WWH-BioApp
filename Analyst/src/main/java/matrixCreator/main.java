@@ -1,11 +1,12 @@
+package matrixCreator;
+
 import matrixCreator.parseMatrix;
 
-import java.io.IOException;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
-import static matrixCreator.matrixMapred.MatrixCreator;
+
+import static matrixCreator.MatrixMapred.MatrixCreator;
 
 /**
  * Created by user on 10/11/15.
@@ -14,9 +15,9 @@ public class main {
     public static void main(String[] args) throws Exception {
         //MatrixCreator();
         parseMatrix parseMatrix = new parseMatrix();
-        String ans = parseMatrix.parseFromHdfs(100,"/home/user/IdeaProjects/WWH-BioApp_resources/matrix/RefIndex.txt","/home/user/IdeaProjects/WWH-BioApp_resources/matrix/HealthyProfile","/home/user/IdeaProjects/WWH-BioApp_resources/matrix/outputMat").toString();
+        String ans = parseMatrix.parseFromHdfs("/matrixOut/RefIndex.txt","/matrixOut/HealthyProfile","/matrixOut/part-r-00000").toString();
 
-        File file = new File("/home/user/IdeaProjects/WWH-BioApp_resources/matrix/mat.csv");
+        File file = new File("/home/user/IdeaProjects/WWH-BioApp_resources/Matrix/ResultMatrix.csv");
 
         // if file doesnt exists, then create it
         if (!file.exists()) {
@@ -27,5 +28,6 @@ public class main {
         BufferedWriter bw = new BufferedWriter(fw);
         bw.write(ans);
         bw.close();
+
     }
 }

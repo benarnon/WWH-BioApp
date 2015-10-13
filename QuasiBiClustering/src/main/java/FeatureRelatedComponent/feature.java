@@ -6,7 +6,7 @@ import java.util.ArrayList;
  * Created by user on 5/31/15.
  */
 public abstract class feature {
-    protected ArrayList<Member> FeatureMemebers = new ArrayList<Member>();
+    protected ArrayList<member> FeatureMemebers = new ArrayList<member>();
     protected  String featureName;
 
     public feature(String featureName) {
@@ -21,13 +21,13 @@ public abstract class feature {
         this.featureName = featureNAme;
     }
 
-    public Member getMember(int index){
+    public member getMember(int index){
         return FeatureMemebers.get(index);
     }
 
-    public abstract Member cloneMember(int index);
+    public abstract member cloneMember(int index);
 
-    public Member getMember(String name){
+    public member getMember(String name){
         return getMember(getMemberIndex(name));
     }
 
@@ -40,15 +40,15 @@ public abstract class feature {
         return -1;
     }
 
-    public void setFeatureMemebers(ArrayList<Member> featureMemebers) {
+    public void setFeatureMemebers(ArrayList<member> featureMemebers) {
         FeatureMemebers = featureMemebers;
     }
 
-    public ArrayList<Member> getFeatureMemebers() {
+    public ArrayList<member> getFeatureMemebers() {
         return FeatureMemebers;
     }
 
-    public void addMember(Member member){
+    public void addMember(member member){
         FeatureMemebers.add(member);
     }
 
@@ -56,7 +56,7 @@ public abstract class feature {
         return FeatureMemebers.size();
     }
 
-    public boolean isContainByName(Member me) {
+    public boolean isContainByName(member me) {
         for (int i = 0; i < FeatureMemebers.size(); i++) {
             if (me.getName().equals(FeatureMemebers.get(i).getName()))
                 return true;

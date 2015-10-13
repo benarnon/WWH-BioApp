@@ -1,8 +1,8 @@
 package BasicComponent;
 
 import Enumeration.Hit;
-import FeatureRelatedComponent.GeneUnit;
-import FeatureRelatedComponent.Member;
+import FeatureRelatedComponent.geneUnit;
+import FeatureRelatedComponent.member;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,41 +15,24 @@ import java.util.ArrayList;
  */
 public class MatrixFileParser {
     private Hit[][] matrix;
-    private ArrayList<Member> geneUnits = new ArrayList<>();
+    private ArrayList<member> geneUnits = new ArrayList<>();
     private ArrayList<Sample> samples = new ArrayList<>();
 
 
-    public ArrayList<Member> getGeneUnits() {
+    public ArrayList<member> getGeneUnits() {
         return geneUnits;
-    }
-
-    public void setGeneUnits(ArrayList<Member> geneUnits) {
-        this.geneUnits = geneUnits;
     }
 
     public ArrayList<Sample> getSamples() {
         return samples;
     }
 
-    public void setSamples(ArrayList<Sample> samples) {
-        this.samples = samples;
-    }
-
-    public MatrixFileParser(File file, ArrayList<Member> geneUnits, ArrayList<Sample> samples) throws IOException {
-
+    public MatrixFileParser(File file, ArrayList<member> geneUnits, ArrayList<Sample> samples) throws IOException {
+        matrix = new Hit[geneUnits.size()][samples.size()];
         FileReader fr = new FileReader(file);
         BufferedReader reader = new BufferedReader(fr);
-        String nameLine = reader.readLine();
-        //Get the matrix dimensions
-
-        if (nameLine != null){
-            String[] split = nameLine.split(" ");
-            matrix = new Hit[Integer.parseInt(split[0])][Integer.parseInt(split[1])];
-
-        }
-        //Get all the samples
-        nameLine = reader.readLine();
-        if (nameLine != null){
+        String nameLine;
+        if ( (nameLine = reader.readLine() ) != null){
             String[] SamplesName = nameLine.split("\t");
             for (int i = 0; i < SamplesName.length; i++) {
                 this.samples.add(i, getSampleByName(samples, SamplesName[i]));
@@ -60,10 +43,10 @@ public class MatrixFileParser {
         nameLine = reader.readLine();
         while(nameLine!=null){
             String[] split = nameLine.split("\t");
-            int l = split[0].split("\\|").length;
-            this.geneUnits.add(i, getGenomeByName(geneUnits,split[0].split("\\|")[l-1].substring(1)));
-            for (int k = 2; k < split.length; k++) {
-                matrix[i][k-2] = new Hit(Float.parseFloat(split[k]));
+            String geneId = split[0];
+            this.geneUnits.add(i,getGenomeByName(geneUnits,geneId));
+            for (int k = 1; k < split.length; k++) {
+                matrix[i][k-1] = new Hit(Float.parseFloat(split[k]));
             }
             i++;
             nameLine = reader.readLine();
@@ -98,10 +81,10 @@ public class MatrixFileParser {
         return null;
     }
 
-    private GeneUnit getGenomeByName(ArrayList<Member> geneUnits, String name){
+    private geneUnit getGenomeByName(ArrayList<member> geneUnits, String name){
         for (int i = 0; i < geneUnits.size(); i++) {
             if (geneUnits.get(i).getName().equals(name))
-                return (GeneUnit)geneUnits.get(i);
+                return (geneUnit)geneUnits.get(i);
         }
         return null;
     }

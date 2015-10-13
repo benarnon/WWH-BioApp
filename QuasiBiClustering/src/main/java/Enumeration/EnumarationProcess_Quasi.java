@@ -1,10 +1,9 @@
 package Enumeration;
 
 
-import FeatureRelatedComponent.FeatureArray;
-import FeatureRelatedComponent.GeneUnit;
+import FeatureRelatedComponent.featureArray;
 import BasicComponent.Sample;
-import FeatureRelatedComponent.Member;
+import FeatureRelatedComponent.member;
 import FeatureRelatedComponent.feature;
 import Mains.EnumParams;
 
@@ -19,7 +18,7 @@ public class EnumarationProcess_Quasi
 {
 
         ArrayList<Sample> _samples;
-        FeatureArray _featureArray;
+        featureArray _featureArray;
 
         Clusters_Holder _cluster_holder;
         ArrayList<Cluster> _clusters;
@@ -29,7 +28,7 @@ public class EnumarationProcess_Quasi
 
         public ArrayList<Quasi_biclique> _quasi_bicliques = new ArrayList<Quasi_biclique>();
 
-    public void work(ArrayList<Sample> samples, FeatureArray featureArray) throws Exception {
+    public void work(ArrayList<Sample> samples, featureArray featureArray) throws Exception {
        _samples = samples;
        _featureArray = featureArray;
         _cluster_holder = new Clusters_Holder();
@@ -54,8 +53,9 @@ public class EnumarationProcess_Quasi
 
         Sample sample;
         Node node;
-        for (int i = 0; i < _samples.size() ; i++) {
+        for (int i = 1; i < _samples.size() ; i++) {
             sample = _samples.get(i);
+            System.out.println(sample.getSampleName());
             if(sample.isValid()){
                 node = appendBrothers(sample);
                 if (node._children.size()>0)
@@ -113,14 +113,14 @@ public class EnumarationProcess_Quasi
         return node;
     }
 
-    private FeatureArray createMutualNew(ArrayList<Sample> samples, FeatureArray mutual_feature_array) throws Exception {
-        FeatureArray featureArray = new FeatureArray();
+    private featureArray createMutualNew(ArrayList<Sample> samples, featureArray mutual_feature_array) throws Exception {
+        featureArray featureArray = new featureArray();
         for (int l = 0; l < mutual_feature_array.getNumOfFeatures(); l++) {
             feature fe = mutual_feature_array.getFeature(l);
             featureArray.createNewFeature(fe.getFeatureName());
             for (int i = 0; i < fe.getNumOfMember(); i++) {
                 boolean check = true;
-                Member me = fe.getMember(i);
+                member me = fe.getMember(i);
                 for (int j = 0; j < samples.size(); j++) {
                     feature f = samples.get(j).getFeature(l);
                     if (!f.isContainByName(me))
@@ -143,11 +143,11 @@ public class EnumarationProcess_Quasi
     }
 
     public void nested_genrateCliques(ArrayList<Sample> x_new,
-                                      FeatureArray mutual_feature_array){
+                                      featureArray mutual_feature_array){
         generateCliques(x_new,mutual_feature_array);
     }
     private void generateCliques(ArrayList<Sample> x_new,
-                                 FeatureArray mutual_feature_array) {
+                                 featureArray mutual_feature_array) {
         Quasi_biclique clique = new Quasi_biclique(x_new,mutual_feature_array);
         addClique(clique);
 
@@ -205,7 +205,7 @@ public class EnumarationProcess_Quasi
         Node _father;
         ArrayList<Node> _leavesInSubtree;
         Sample _sample;
-        FeatureArray _mutual_feature_array;
+        featureArray _mutual_feature_array;
 
         ArrayList<Sample> _samples; //will be relevant only for the leaf nodes
         //to avoid path to the root
@@ -218,7 +218,7 @@ public class EnumarationProcess_Quasi
             _sample = sample;
             _children = new ArrayList<Node>();
             _leavesInSubtree = new ArrayList<Node>();
-            _mutual_feature_array = new FeatureArray();
+            _mutual_feature_array = new featureArray();
             _father = null;
         }
 
@@ -232,7 +232,7 @@ public class EnumarationProcess_Quasi
             boolean check = true;
             if (_children.size()==0) //leaf
             {
-                newN._mutual_feature_array = new FeatureArray();
+                newN._mutual_feature_array = new featureArray();
                 newN._samples = new ArrayList<Sample>();
                 for (int j = 0; j <this._mutual_feature_array.getNumOfFeatures();  j++) {
                     try {

@@ -5,15 +5,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
+ * Created by user on 10/11/15.
  */
-public class matrix {
+public class Matrix {
     private double[][] matrix;
 
     private Map<String ,Integer> genes = new HashMap<>();
 
     private Map<String,Integer> samples = new HashMap<>();
-    public matrix() {}
+    public Matrix() {}
 
     public void setMatrixSize(int numOfGenes, int numOfSamples) {matrix = new double[numOfGenes][numOfSamples];}
 
@@ -41,6 +41,14 @@ public class matrix {
 
     public int getGene(String geneId){
         return genes.get(geneId);
+    }
+
+    public Map<String, Integer> getSamples() {
+        return samples;
+    }
+
+    public Map<String, Integer> getGenes() {
+        return genes;
     }
 
     private int getSample(String sampleId) {
@@ -76,15 +84,5 @@ public class matrix {
         }
 
         return ans;
-    }
-
-
-
-    public Map<String, Integer> getSamples() {
-        return samples;
-    }
-
-    public Map<String, Integer> getGenes() {
-        return genes;
     }
 }

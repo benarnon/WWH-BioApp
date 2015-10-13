@@ -5,18 +5,16 @@ package matrixCreator;
  */
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.*;
 import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
 import java.io.IOException;
 import java.util.Iterator;
 
-public class matrixCreator {
-    private static final Log LOG = LogFactory.getLog(matrixCreator.class);
+public class MatrixCreator {
+    private static final Log LOG = LogFactory.getLog(MatrixCreator.class);
 
 
     public static class ClusterMapper extends Mapper <LongWritable, Text, Text, Text>{

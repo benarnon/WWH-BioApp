@@ -5,16 +5,13 @@ import BasicComponent.DatabaseIndex;
 /**
  * Created by user on 5/10/15.
  */
-public class GeneUnit extends Member {
+public class geneUnit extends member {
     private int length;
-    private DatabaseIndex[] DbList;
 
 
-
-    public GeneUnit(String genomeName, int length, DatabaseIndex[] dbList) {
+    public geneUnit(String genomeName, int length) {
         super(genomeName);
         this.length = length;
-        DbList = dbList;
     }
 
     public String getGenomeName() {
@@ -33,11 +30,4 @@ public class GeneUnit extends Member {
         this.length = length;
     }
 
-    public DatabaseIndex[] getDbList() {
-        return DbList;
-    }
-
-    public void setDbList(DatabaseIndex[] dbList) {
-        DbList = dbList;
-    }
 }

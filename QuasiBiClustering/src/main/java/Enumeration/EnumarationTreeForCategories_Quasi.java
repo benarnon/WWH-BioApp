@@ -1,8 +1,7 @@
 package Enumeration;
 
 
-import FeatureRelatedComponent.FeatureArray;
-import FeatureRelatedComponent.GeneUnit;
+import FeatureRelatedComponent.featureArray;
 import BasicComponent.Sample;
 
 import java.util.ArrayList;
@@ -12,7 +11,7 @@ import java.util.ArrayList;
 public class EnumarationTreeForCategories_Quasi
 {
     ArrayList<Sample> _samplesInCat;
-    FeatureArray _featureArray = new FeatureArray();
+    featureArray _featureArray = new featureArray();
 
     int _uniqueGenesInCatNum; //only different ENSG
     int _total_num_of_samples;//unique - for p-value

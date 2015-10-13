@@ -11,7 +11,8 @@
     <modules>
         <module>VectorCreator</module>
         <module>QuasiBiClustering</module>
-        <module>MatrxiCreator</module>
+        <module>Analyst</module>
+        <module>Report</module>
 
     </modules>
 
@@ -64,6 +65,11 @@
                 <groupId>org.jfree</groupId>
                 <artifactId>jfreechart</artifactId>
                 <version>1.0.19</version>
+            </dependency>
+            <dependency>
+                <groupId>com.googlecode.json-simple</groupId>
+                <artifactId>json-simple</artifactId>
+                <version>1.1</version>
             </dependency>
         </dependencies>
 

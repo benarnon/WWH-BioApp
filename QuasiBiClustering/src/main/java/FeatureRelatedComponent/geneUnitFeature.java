@@ -7,23 +7,23 @@ import java.util.ArrayList;
 /**
  * Created by user on 6/1/15.
  */
-public class GeneUnitFeature extends feature {
-    public GeneUnitFeature() {
+public class geneUnitFeature extends feature {
+    public geneUnitFeature() {
         super(EnumParams.GenesFeatureName);
-        FeatureMemebers = new ArrayList<Member>();
+        FeatureMemebers = new ArrayList<member>();
     }
 
     @Override
-    public Member cloneMember(int index) {
-        GeneUnit gene = (GeneUnit)FeatureMemebers.get(index);
+    public member cloneMember(int index) {
+        geneUnit gene = (geneUnit)FeatureMemebers.get(index);
 
-        Member ans = new GeneUnit(gene.getName(),gene.getLength(),gene.getDbList());
+        member ans = new geneUnit(gene.getName(),gene.getLength());
         return ans;
     }
 
     @Override
-    public void addMember(Member member) {
-        if (member instanceof GeneUnit){
+    public void addMember(member member) {
+        if (member instanceof geneUnit){
             FeatureMemebers.add(member);
         }
         else{

@@ -15,7 +15,7 @@ public class Sample {
     private String location;
     private int numOfFeatures = 0;
 
-    private FeatureArray featureArray = new FeatureArray();
+    private FeatureRelatedComponent.featureArray featureArray = new featureArray();
 
     public Sample(String sampleName, Date date, String location) {
         this.sampleName = sampleName;
@@ -48,15 +48,15 @@ public class Sample {
 
 
     public feature getFeature(int l) {return featureArray.getFeature(l);}
-    public Member getMember(String featureName,int memberIndex){
+    public member getMember(String featureName,int memberIndex){
         return featureArray.getMember(featureName,memberIndex);
     }
 
-    public Member getMember(String featureName,String memberName){
+    public member getMember(String featureName,String memberName){
         return featureArray.getMember(featureName,memberName);
     }
 
-    public void setMember(String featureName,Member member) throws Exception {
+    public void setMember(String featureName, member member) throws Exception {
         featureArray.addFeatureMemeber(featureName,member);
     }
 

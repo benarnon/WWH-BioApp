@@ -1,41 +1,23 @@
 package FeatureRelatedComponent;
 
-import Mains.EnumParams;
-
 import java.util.ArrayList;
 
 /**
  * Created by user on 6/1/15.
  */
-public class FeatureArray {
+public class featureArray {
     protected ArrayList<feature> FeaturesArray= new ArrayList<>();
 
 
     public void createNewFeature(int index, String featureName) throws Exception {
         feature Feature;
-        if (featureName.equals("Symptoms")) {
-            Feature = new SymptomsFeature();
-        }
-        else if(featureName.equals("GeneUnit")){
-            Feature = new GeneUnitFeature();
-        }
-        else{
-            throw new Exception("Not a valid name for feature");
-        }
+        Feature = new geneUnitFeature();
         FeaturesArray.add(index,Feature);
     }
 
     public void createNewFeature(String featureName) throws Exception {
         feature Feature;
-        if (featureName.equals(EnumParams.SymptomsFeatureName)) {
-            Feature = new SymptomsFeature();
-        }
-        else if(featureName.equals(EnumParams.GenesFeatureName)){
-            Feature = new GeneUnitFeature();
-        }
-        else{
-            throw new Exception("Not a valid name for feature");
-        }
+        Feature = new geneUnitFeature();
         FeaturesArray.add(Feature);
     }
 
@@ -43,7 +25,7 @@ public class FeatureArray {
         FeaturesArray.add(index,fe);
     }
 
-    public void addFeatureMemeber(String featureName, Member featureMemeber) throws Exception {
+    public void addFeatureMemeber(String featureName, member featureMemeber) throws Exception {
         int index= getFeatureIndex(featureName);
         if(index == -1){
             throw new Exception("No such feature exist");
@@ -69,19 +51,19 @@ public class FeatureArray {
         return FeaturesArray.get(index);
     }
 
-    public Member getMember(String featureName, String memberName){
+    public member getMember(String featureName, String memberName){
         return getFeature(featureName).getMember(memberName);
     }
 
-    public Member getMember(String featureName, int memberIndex){
+    public member getMember(String featureName, int memberIndex){
         return getFeature(featureName).getMember(memberIndex);
     }
 
-    public Member getMember(int featureIndex, int memberIndex){
+    public member getMember(int featureIndex, int memberIndex){
         return getFeature(featureIndex).getMember(memberIndex);
     }
 
-    public void setFeatureMemberArray(String featureName,ArrayList<Member> featureMemebers){
+    public void setFeatureMemberArray(String featureName,ArrayList<member> featureMemebers){
         feature fe =  FeaturesArray.get(getFeatureIndex(featureName));
         fe.setFeatureMemebers(featureMemebers);
     }

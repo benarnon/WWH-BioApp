@@ -15,23 +15,23 @@ import java.io.IOException;
 /**
  * Created by user on 10/11/15.
  */
-public class matrixMapred {
-    private static final Log LOG = LogFactory.getLog(matrixCreator.class);
+public class MatrixMapred {
+    private static final Log LOG = LogFactory.getLog(MatrixCreator.class);
     public static void MatrixCreator() throws IOException, Exception
 
     {
         Configuration conf = new Configuration(true);
 
         Job job = new Job(conf, "matrixCreator");
-        FileInputFormat.addInputPath(job, new Path("/out/Sample100/Local/finalVecor/part-r-00000"));
-        job.setJarByClass(matrixCreator.class);
-        job.setMapperClass(matrixCreator.ClusterMapper.class);
+        FileInputFormat.addInputPath(job, new Path("/MatInput"));
+        job.setJarByClass(MatrixCreator.class);
+        job.setMapperClass(MatrixCreator.ClusterMapper.class);
 
         //conf.setInputFormat(SequenceFileInputFormat.class);
         job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(Text.class);
 
-        job.setReducerClass(matrixCreator.ClusterReducer.class);
+        job.setReducerClass(MatrixCreator.ClusterReducer.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
         //conf.setOutputFormat(SequenceFileOutputFormat.class);

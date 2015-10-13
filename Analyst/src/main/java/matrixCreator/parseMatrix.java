@@ -1,9 +1,11 @@
 package matrixCreator;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+
+
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,23 +15,26 @@ import java.util.Map;
  */
 public class parseMatrix {
     private Map<String,Double> healthyProfile = new HashMap<>();
-    private matrix mat;
+    private Matrix mat;
 
     public parseMatrix() {
-        mat = new matrix();
+        mat = new Matrix();
     }
 
-    public matrix parseFromHdfs(int numOfSamples, String geneListPath, String healthyPath,String WWHmatrixPath) throws IOException {
+    public Matrix parseFromHdfs(String geneListPath, String healthyPath,String hdfsMatrixFile) throws IOException {
         parseGeneList(geneListPath);
-        fillMatrix(WWHmatrixPath);
+        fillMatrix(hdfsMatrixFile);
         parseHealthy(healthyPath);
         substractFromHealthy();
         return mat;
     }
 
     private void parseGeneList(String geneListPath) throws IOException {
-        FileReader reader = new FileReader(geneListPath);
-        BufferedReader br = new BufferedReader(reader);
+        Path pt=new Path(geneListPath);
+        FileSystem fs = FileSystem.get(new Configuration());
+        if (!fs.exists(pt))
+            System.out.println("Input file not found");
+        BufferedReader br=new BufferedReader(new InputStreamReader(fs.open(pt)));
         String line;
         int index = 0;
         while((line = br.readLine()) != null){
@@ -41,12 +46,18 @@ public class parseMatrix {
     }
 
     private void fillMatrix(String wwHmatrixPath) throws IOException {
-        FileReader reader = new FileReader(wwHmatrixPath);
-        BufferedReader br = new BufferedReader(reader);
+        Path pt=new Path(wwHmatrixPath);
+        FileSystem fs = FileSystem.get(new Configuration());
+        if (!fs.exists(pt))
+            System.out.println("Input file not found");
+        BufferedReader br=new BufferedReader(new InputStreamReader(fs.open(pt)));
         String line;
+        FileReader reader = new FileReader(wwHmatrixPath);
         int sampleIndex = 0;
         String currentSample = "";
+
         mat.setMatrixSize(mat.getNumOfGenes(),99); //TODO number of samples is not dynamic
+
         while((line = br.readLine()) !=null ){
             if(!line.equals("") && line.split("\t").length == 1){
                 mat.setSample(line,sampleIndex);
@@ -75,7 +86,7 @@ public class parseMatrix {
             }
         }
     }
-
+    //Substract genes wich are no significant
     private void substractFromHealthy() {
         String ans = "\t";
         Map<String, Integer> samples = mat.getSamples();
@@ -88,10 +99,10 @@ public class parseMatrix {
                 double healthyAbundance = healthyProfile.get(entry.getKey());
                 for (Map.Entry<String, Integer> entry2 : samples.entrySet()) {
                     double currentAbundance = mat.getAbundance(entry.getKey(), entry2.getKey());
-                    if (currentAbundance - healthyAbundance < 0.4)
+                    if (currentAbundance - healthyAbundance < 1)
                         mat.setAbundance(entry.getKey(), entry2.getKey(), (double) 0);
                     else {
-                        mat.setAbundance(entry.getKey(), entry2.getKey(), currentAbundance - healthyAbundance);
+                        mat.setAbundance(entry.getKey(), entry2.getKey(), (double)1);
                         counter++;
                     }
                 }
@@ -104,6 +115,49 @@ public class parseMatrix {
                 }
             }
 
+            else {
+                for (Map.Entry<String, Integer> entry2 : samples.entrySet()) {
+                    double currentAbundance = mat.getAbundance(entry.getKey(), entry2.getKey());
+                    if (currentAbundance < 1)
+                        mat.setAbundance(entry.getKey(), entry2.getKey(), (double) 0);
+                    else {
+                        mat.setAbundance(entry.getKey(), entry2.getKey(), (double) 1);
+                        counter++;
+                    }
+
+                }
+                if (counter > 50) {
+                    num++;
+                    System.out.println("delete row " + num);
+                    for (Map.Entry<String, Integer> entry2 : samples.entrySet()) {
+                        mat.setAbundance(entry.getKey(), entry2.getKey(), (double) 0);
+                    }
+                }
+            }
+
+
+        }
+
+
+    }
+
+    //Without substratcing genes
+    private void substractFromHealthy2() {
+        String ans = "\t";
+        Map<String, Integer> samples = mat.getSamples();
+        Map<String, Integer> genes = mat.getGenes();
+        for (Map.Entry<String, Integer> entry : genes.entrySet()) {
+
+            if (healthyProfile.get(entry.getKey()) != null) {
+                double healthyAbundance = healthyProfile.get(entry.getKey());
+                for (Map.Entry<String, Integer> entry2 : samples.entrySet()) {
+                    double currentAbundance = mat.getAbundance(entry.getKey(), entry2.getKey());
+                    mat.setAbundance(entry.getKey(), entry2.getKey(), currentAbundance - healthyAbundance);
+                }
+            }
         }
     }
+
+
 }
+

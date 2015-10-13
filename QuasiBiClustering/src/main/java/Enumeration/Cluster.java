@@ -1,15 +1,14 @@
 package Enumeration;
 
 
-import FeatureRelatedComponent.FeatureArray;
-import FeatureRelatedComponent.GeneUnit;
+import FeatureRelatedComponent.featureArray;
 import BasicComponent.Sample;
 
 import java.util.ArrayList;
 
 public class Cluster
 {
-    public FeatureArray _featureArray = new FeatureArray();
+    public featureArray _featureArray = new featureArray();
     public ArrayList<Sample> _samples = new ArrayList<Sample>();
 
     public double _p_val;
@@ -18,7 +17,7 @@ public class Cluster
     public int _n;
     public int _g;
 
-    public Cluster(FeatureArray _featureArray, ArrayList<Sample> _samples) {
+    public Cluster(featureArray _featureArray, ArrayList<Sample> _samples) {
         this._featureArray = _featureArray;
         this._samples = _samples;
     }
