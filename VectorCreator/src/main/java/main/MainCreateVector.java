@@ -12,7 +12,7 @@ import java.io.IOException;
 /**
  * Created by user on 7/6/15.
  */
-public class mainCreateVector {
+public class MainCreateVector {
     static String SampleName;
     static String qpath;
     static String rpath;

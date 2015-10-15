@@ -1,6 +1,13 @@
 package matrixCreator;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Arrays;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -84,5 +91,42 @@ public class Matrix {
         }
 
         return ans;
+    }
+
+    public String matrixTojson(String outputJsonFile) throws IOException {
+        //outbreak test results
+        JSONObject outbreakResult = new JSONObject();
+        JSONObject description = new JSONObject();
+        description.put("name","Ebola");
+        description.put("date","Octiber 18th, 2015");
+
+        outbreakResult.put("description",description);
+
+        JSONArray allSamples = new JSONArray();
+
+        for (Map.Entry<String, Integer> entry : samples.entrySet())
+        {
+            //Add  metadata file to the samples
+            JSONObject sample = new JSONObject();
+            sample.put("name",entry.getKey());
+            sample.put("date","");
+            JSONArray symptoms = new JSONArray();
+            sample.put("symptoms",symptoms);
+            JSONArray geneUnits = new JSONArray();
+            for (Map.Entry<String, Integer> entry2 : genes.entrySet()){
+                JSONObject geneUnit =new JSONObject();
+                geneUnit.put("name",entry2.getKey());
+                geneUnit.put("abundance",entry2.getValue());
+                geneUnits.add(geneUnit);
+            }
+            sample.put("GeneUnit",geneUnits);
+            allSamples.add(sample);
+        }
+        outbreakResult.put("allSamples",allSamples);
+        FileWriter outputFile = new FileWriter("/home/user/Desktop/IdeaProjects/WWH-BioApp_resources/Profiles/outputFile.json");
+        outputFile.write(outbreakResult.toJSONString());
+        outputFile.flush();
+        outputFile.close();
+        return outbreakResult.toString();
     }
 }

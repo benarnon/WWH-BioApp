@@ -23,7 +23,7 @@ public class MatrixMapred {
         Configuration conf = new Configuration(true);
 
         Job job = new Job(conf, "matrixCreator");
-        FileInputFormat.addInputPath(job, new Path("/MatInput"));
+        FileInputFormat.addInputPath(job, new Path("/Matinput/Unit"));
         job.setJarByClass(MatrixCreator.class);
         job.setMapperClass(MatrixCreator.ClusterMapper.class);
 

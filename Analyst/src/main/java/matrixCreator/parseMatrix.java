@@ -3,6 +3,8 @@ package matrixCreator;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 
 import java.io.*;
@@ -10,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * parseMatrix class main goal is to parse the hdfs file after the MatrixCreator mapreduce phase.
+ * parseMatrix class's  goal is to parse the hdfs file after the MatrixCreator mapreduce phase.
  * input: hdfs file, healthy profile, gene list
  */
 public class parseMatrix {
@@ -21,15 +23,31 @@ public class parseMatrix {
         mat = new Matrix();
     }
 
-    public Matrix parseFromHdfs(String geneListPath, String healthyPath,String hdfsMatrixFile) throws IOException {
-        parseGeneList(geneListPath);
+    public void parseFromHdfs(String geneListPath, String healthyPath,String hdfsMatrixFile, String  outputMatrixPath, String geneunitsJsonPath) throws IOException {
+        parseGeneList(geneListPath,geneunitsJsonPath);
         fillMatrix(hdfsMatrixFile);
         parseHealthy(healthyPath);
-        substractFromHealthy();
-        return mat;
+        substractFromHealthy2();
+
+        String ans = mat.toString();
+
+        File file = new File(outputMatrixPath);
+
+        // if file doesnt exists, then create it
+        if (!file.exists()) {
+            file.createNewFile();
+        }
+
+        FileWriter fw = new FileWriter(file.getAbsoluteFile());
+        BufferedWriter bw = new BufferedWriter(fw);
+        bw.write(ans);
+        bw.close();
+        System.out.println("Finish to write matrix file " + outputMatrixPath);
     }
 
-    private void parseGeneList(String geneListPath) throws IOException {
+    private void parseGeneList(String geneListPath,String geneunitsJsonPath) throws IOException {
+        JSONArray geneUnits = new JSONArray();
+        JSONObject geneUnit = new JSONObject();
         Path pt=new Path(geneListPath);
         FileSystem fs = FileSystem.get(new Configuration());
         if (!fs.exists(pt))
@@ -39,10 +57,24 @@ public class parseMatrix {
         int index = 0;
         while((line = br.readLine()) != null){
             if(line.split("\t").length == 2){
+                geneUnit = new JSONObject();
+                String description = "";
+                for (int i = 1; i < line.split("\t")[0].split(" ").length; i++) {
+                    description = description + " " + line.split("\t")[0].split(" ")[i];
+                }
+                geneUnit.put("id",line.split("\t")[0].split(" ")[0]);
+                geneUnit.put("description",description);
+                geneUnits.add(geneUnit);
                 mat.setGene(line.split("\t")[0],index);
                 index++;
             }
         }
+        FileWriter outputFile = new FileWriter(geneunitsJsonPath);
+        outputFile.write(geneUnits.toJSONString());
+        outputFile.flush();
+        outputFile.close();
+        System.out.println("Finish to write geneunits json file " + geneunitsJsonPath);
+
     }
 
     private void fillMatrix(String wwHmatrixPath) throws IOException {
@@ -86,68 +118,10 @@ public class parseMatrix {
             }
         }
     }
-    //Substract genes wich are no significant
-    private void substractFromHealthy() {
-        String ans = "\t";
-        Map<String, Integer> samples = mat.getSamples();
-        Map<String, Integer> genes = mat.getGenes();
-        int counter,num = 0;
-        for (Map.Entry<String, Integer> entry : genes.entrySet()) {
-            counter = 0;
-
-            if (healthyProfile.get(entry.getKey()) != null) {
-                double healthyAbundance = healthyProfile.get(entry.getKey());
-                for (Map.Entry<String, Integer> entry2 : samples.entrySet()) {
-                    double currentAbundance = mat.getAbundance(entry.getKey(), entry2.getKey());
-                    if (currentAbundance - healthyAbundance < 1)
-                        mat.setAbundance(entry.getKey(), entry2.getKey(), (double) 0);
-                    else {
-                        mat.setAbundance(entry.getKey(), entry2.getKey(), (double)1);
-                        counter++;
-                    }
-                }
-                if (counter > 50) {
-                    num++;
-                    System.out.println("delete row " + num);
-                    for (Map.Entry<String, Integer> entry2 : samples.entrySet()) {
-                        mat.setAbundance(entry.getKey(), entry2.getKey(), (double) 0);
-                    }
-                }
-            }
-
-            else {
-                for (Map.Entry<String, Integer> entry2 : samples.entrySet()) {
-                    double currentAbundance = mat.getAbundance(entry.getKey(), entry2.getKey());
-                    if (currentAbundance < 1)
-                        mat.setAbundance(entry.getKey(), entry2.getKey(), (double) 0);
-                    else {
-                        mat.setAbundance(entry.getKey(), entry2.getKey(), (double) 1);
-                        counter++;
-                    }
-
-                }
-                if (counter > 50) {
-                    num++;
-                    System.out.println("delete row " + num);
-                    for (Map.Entry<String, Integer> entry2 : samples.entrySet()) {
-                        mat.setAbundance(entry.getKey(), entry2.getKey(), (double) 0);
-                    }
-                }
-            }
-
-
-        }
-
-
-    }
-
-    //Without substratcing genes
-    private void substractFromHealthy2() {
-        String ans = "\t";
+        private void substractFromHealthy2() {
         Map<String, Integer> samples = mat.getSamples();
         Map<String, Integer> genes = mat.getGenes();
         for (Map.Entry<String, Integer> entry : genes.entrySet()) {
-
             if (healthyProfile.get(entry.getKey()) != null) {
                 double healthyAbundance = healthyProfile.get(entry.getKey());
                 for (Map.Entry<String, Integer> entry2 : samples.entrySet()) {

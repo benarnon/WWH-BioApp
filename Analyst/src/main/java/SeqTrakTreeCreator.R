@@ -1,8 +1,7 @@
-args=(commandArgs(TRUE))
 library(adegenet)
-spearmanmat <- as.matrix(read.csv(file= file.path(args,"matrix.csv",sep="") , sep=",", header=FALSE))
-date <- read.csv(file.path(args,"dates.csv",sep=""))
+spearmanmat <- as.matrix(read.csv(file="/home/user/IdeaProjects/WWH-BioApp_resources/TreeCreator/midFiles/matrix.csv", sep=",", header=FALSE))
+date <- read.csv("/home/user/IdeaProjects/WWH-BioApp_resources/TreeCreator/midFiles/dates.csv")
 dates <- as.Date(date$collec.dates)
 id <- date$id
 res <- seqTrack(spearmanmat,x.names=id,x.dates=dates)
-write.csv(res,file=file.path(args,"res.csv",sep=""))
+write.csv(res,file="/home/user/IdeaProjects/WWH-BioApp_resources/TreeCreator/midFiles/res.csv")

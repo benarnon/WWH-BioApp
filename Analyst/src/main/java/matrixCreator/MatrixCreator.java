@@ -14,8 +14,6 @@ import java.io.IOException;
 import java.util.Iterator;
 
 public class MatrixCreator {
-    private static final Log LOG = LogFactory.getLog(MatrixCreator.class);
-
 
     public static class ClusterMapper extends Mapper <LongWritable, Text, Text, Text>{
         @Override

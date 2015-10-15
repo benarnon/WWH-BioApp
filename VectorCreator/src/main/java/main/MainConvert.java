@@ -7,7 +7,7 @@ import java.io.IOException;
 /**
  * Created by user on 7/27/15.
  */
-public class mainConvert {
+public class MainConvert {
 
     public static void main(String[] args) {
         //qpath rpath outPath SampleName
